@@ -424,3 +424,21 @@ class TriadicConcept:
 
         return triadic_concepts
 
+    def compute_formal_context(triadic_concepts):
+        formal_context = Definition()
+        for concept in triadic_concepts:
+            extent = [x for x in concept.extent]
+            intent = [x for x in concept.intent]
+            modus = [x for x in concept.modus]
+            permutation = [(x, y) for x, y in zip(intent, modus)]
+            if extent != []:
+                for combination in permutation:
+                    adds = [(e, i, m) for e in extent for i in combination[0]
+                            for m in combination[1]]
+                    for to_add in adds:
+                        _extent, _intent, _modus = to_add
+                        if _intent != 'ø' and _modus != 'ø':
+                            formal_context.add_object(
+                                str(_extent), [(str(_intent) + " " + str(_modus))])
+
+        return Context(*formal_context)
