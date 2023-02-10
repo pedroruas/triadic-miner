@@ -135,7 +135,7 @@ def mine(file_path, compute_minimality_for_infimum):
     # for x in links:
     #     print(x)
     Timer.start("Computing F-Generators")
-    updated_triadic_concepts = TriadicConcept.compute_f_generators(
+    updated_triadic_concepts = TriadicConcept.compute_f_generators_candidates(
         triadic_concepts, links, compute_minimality_for_infimum)
     time = Timer.stop()
     # print("Number of itens:", len(links_dict))
