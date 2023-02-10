@@ -11,6 +11,7 @@ import threading
 from multiprocessing.pool import ThreadPool
 import multiprocessing
 from itertools import repeat
+from concepts import Definition, Context
 
 EMPTY_SET = set([])
 PROCESSES = 8  # Amount of threads to be used while computing and validating Feature-Generators
@@ -77,8 +78,8 @@ class TriadicConcept:
                 if concept.extent == unique_extent:
                     list_intent.append(concept.intent)
                     list_modus.append(concept.modus)
-            unique_triadic_concepts.append(TriadicConcept(unique_extent, list_intent,
-                                                          list_modus, len(unique_extent)))
+            unique_triadic_concepts.append(TriadicConcept(
+                unique_extent, list_intent, list_modus, len(unique_extent)))
         return sorted(unique_triadic_concepts, key=lambda x: x.extent_size, reverse=False)
 
     def create_triadic_concepts_faces(triadic_concepts):
@@ -193,7 +194,7 @@ class TriadicConcept:
         # print(context)
         return context
 
-    def f_generator(key, links_dict, links, triadic_concepts):
+    def f_generator(key, links_dict, triadic_concepts):
 
         def compute_face_kth_successor(target_intent, target_modus):
             for intent_item, modus_item in zip(target_intent, target_modus):
@@ -412,7 +413,7 @@ class TriadicConcept:
                 ext_uniques.remove(EMPTY_SET)
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(TriadicConcept.f_generator, zip(ext_uniques, repeat(
-                links_dict), repeat(links), repeat(triadic_concepts))):
+                links_dict), repeat(triadic_concepts))):
             updated_triadic_concepts.append(result)
         pool.close()
         for concept in updated_triadic_concepts:
@@ -422,3 +423,4 @@ class TriadicConcept:
         compute_f_generators_supremum(triadic_concepts)
 
         return triadic_concepts
+
