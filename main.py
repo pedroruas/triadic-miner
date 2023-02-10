@@ -23,7 +23,7 @@ def old():
     df.loc[df['Extent'] == "ø", 'Extent'] = frozenset(empty_set)
     # Creating the column "|Extent|" with all values equal to 0
     df["|Extent|"] = 0
-
+    
     for row in df.itertuples():
         idx = row[0]
         try:
@@ -145,6 +145,12 @@ def mine(file_path, compute_minimality_for_infimum):
         print(c)
         print()
     # print(triadic_concepts[triadic_concepts.index({'2'})])
+    
+    Timer.start("Computing Formal Context")
+    context = TriadicConcept.compute_formal_context(
+        updated_triadic_concepts)
+    time = Timer.stop()
+    # print(context)
 
 
 def main():
@@ -157,7 +163,7 @@ def main():
         print(f'Running Triadic Miner on {input_file_path} file...')
         compute_minimality_for_infimum = data[
             'compute_feature_generators_minimality_test_for_infimum']
-        print(compute_minimality_for_infimum)
+
         mine(input_file_path, compute_minimality_for_infimum)
 
 
