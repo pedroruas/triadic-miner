@@ -27,12 +27,13 @@ class TriadicConcept:
     modus: set
     extent_size: int
     feature_generator: list[list] = field(default_factory=list)
-
+    feature_generator_candidates: list[list] = field(default_factory=list)
+    
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators: {self.feature_generator}'
+        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}'
 
     def __eq__(self, other):
         if other == self.extent:
@@ -372,11 +373,11 @@ class TriadicConcept:
         # print("t_generator KEYS SIZE: ", len(t_generator.keys()))
         # print("t_generator VALUES SIZE: ", len(t_generator.values()))
         updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
-            current_concept_extent)].feature_generator = t_generator
+            current_concept_extent)].feature_generator_candidates = t_generator
 
         return updadet_triadic_concept
 
-    def compute_f_generators(triadic_concepts, links, compute_minimality_for_infimum):
+    def compute_f_generators_candidates(triadic_concepts, links, compute_minimality_for_infimum):
 
         def compute_f_generators_supremum(triadic_concepts):
             triadic_concepts = sorted(
@@ -401,7 +402,7 @@ class TriadicConcept:
                         except:
                             raise
             updated_triadic_concept = triadic_concepts[triadic_concepts.index(
-                supremum)].feature_generator = G
+                supremum)].feature_generator_candidates = G
             return updated_triadic_concept
 
         updated_triadic_concepts = []
@@ -418,7 +419,7 @@ class TriadicConcept:
         pool.close()
         for concept in updated_triadic_concepts:
             triadic_concepts[triadic_concepts.index(
-                set([x for x in concept.keys()][0]))].feature_generator = [*concept.values()]
+                set([x for x in concept.keys()][0]))].feature_generator_candidates = [*concept.values()]
 
         compute_f_generators_supremum(triadic_concepts)
 
