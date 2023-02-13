@@ -7,5 +7,5 @@
     "Data/example_PNKRS_2017_big.data.out"
   ],
   "output_dir": "miner_output/",
-  "compute_feature_generators_minimality_test_for_infimum": true
+  "compute_feature_generators_minimality_test_for_infimum": false
 }
