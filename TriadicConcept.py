@@ -419,7 +419,7 @@ class TriadicConcept:
         pool.close()
         for concept in updated_triadic_concepts:
             triadic_concepts[triadic_concepts.index(
-                set([x for x in concept.keys()][0]))].feature_generator_candidates = [*concept.values()]
+                set([x for x in concept.keys()][0]))].feature_generator_candidates = [*concept.values()][0]
 
         compute_f_generators_supremum(triadic_concepts)
 
