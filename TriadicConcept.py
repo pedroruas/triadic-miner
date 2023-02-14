@@ -27,13 +27,14 @@ class TriadicConcept:
     modus: set
     extent_size: int
     feature_generator: list[list] = field(default_factory=list)
+    feature_generator_minimal: list[list] = field(default_factory=list)
     feature_generator_candidates: list[list] = field(default_factory=list)
     
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}'
+        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}'
     
     def __eq__(self, other):
         if other == self.extent:
@@ -102,8 +103,7 @@ class TriadicConcept:
                 list: returns a list with the links between Triadic Concepts
         """
         links = []
-        border_max = 0
-        # border <- the very first element with the smallest EXTENT cardinality
+        border_max = 0 # border <- the very first element with the smallest EXTENT cardinality
         border = triadic_concepts[0].extent
 
         for concept in tqdm(triadic_concepts[1:]):
@@ -169,15 +169,10 @@ class TriadicConcept:
         return links_dic
 
     def getContext_K1K2(intent, modus):
-        # CREATING THE CONTEXT (K1,K2xK3,Y) FOR EACH CONCEPT EXTENT
-
-        # print(" - K1K2 FUNCTION"*10)
-        # print("INTENT: ", intent)
-        # print("MODUS: ", modus)
+        
         intent = [list(x) for x in intent]
         modus = [list(x) for x in modus]
-        # print("INTENT: ", intent)
-        # print("MODUS: ", modus)
+
         if len(intent) < 2:
             context = pd.DataFrame(index=intent, columns=modus)
             context = context.fillna(True)
@@ -189,10 +184,8 @@ class TriadicConcept:
             context = pd.DataFrame(index=list(
                 intent_aux), columns=list(modus_aux))
             context = context.fillna(False)
-            # print(context)
             for intent_item, modus_item in zip(intent, modus):
                 context.loc[intent_item, modus_item] = True
-        # print(context)
         return context
 
     def f_generator(concept, links_dict, triadic_concepts):
@@ -201,12 +194,9 @@ class TriadicConcept:
             for intent_item, modus_item in zip(target_intent, target_modus):
                 for x in intent_item:
                     for y in modus_item:
-                        # print("TO REMOVE INCIDENCE: ", x, y)
                         try:
                             if str(y) in context.columns and str(x) in context.index:
                                 context.loc[x, y] = False
-                                # print("INCIDENCE REMOVED")
-                                # print(context)
                         except:
                             raise
             return context
@@ -224,30 +214,21 @@ class TriadicConcept:
         for successor in successors_concepts:
             target = frozenset(successor)
             source = frozenset(concept)
-            # print(triadic_concepts)
             current_concept = triadic_concepts[triadic_concepts.index(
                 set(source))]
             successor_concept = triadic_concepts[triadic_concepts.index(
                 set(target))]
             current_concept_extent = triadic_concepts[triadic_concepts.index(
                 set(source))].extent
-            # current_concept = data_unique.loc[data_unique['Extent'] == set(source)]
-            # successor_concept = data_unique.loc[data_unique['Extent'] == set(target)]
 
             if source not in feature_generator:
                 source_intent = current_concept.intent
                 source_modus = current_concept.modus
                 target_intent = successor_concept.intent
                 target_modus = successor_concept.modus
-                # print(" - INSIDE FUNCTION")
-                # print("SOURCE TC: ", source, source_intent, source_modus)
-                # print("TARGET TC: ", target, target_intent, target_modus)
                 context = TriadicConcept.getContext_K1K2(
                     source_intent, source_modus)
-                # print("CONTEXT K1K2 CREATED: ")
-                # print(context)
 
-                # COMPUTING THE FACE OF A CONCEPT W.R.T. THE K-TH SUCCESSOR
                 context = compute_face_kth_successor(
                     target_intent, target_modus)
 
@@ -268,16 +249,12 @@ class TriadicConcept:
             else:
                 source_intent = current_concept.intent
                 source_modus = current_concept.modus
-                # print(" - INSIDE FUNCTION ELSE")
-                # print("SOURCE TC: ", source, source_intent, source_modus)
-                # print("TARGET TC: ", target, target_intent, target_modus)
                 context = TriadicConcept.getContext_K1K2(
                     source_intent, source_modus)
                 target_intent = successor_concept.intent
                 target_modus = successor_concept.modus
                 G = t_generator[source]
 
-                # COMPUTING THE FACE OF A CONCEPT W.R.T. THE K-TH SUCCESSOR
                 context = compute_face_kth_successor(
                     target_intent, target_modus)
 
@@ -298,7 +275,6 @@ class TriadicConcept:
 
                 G1 = list(G)
                 p = len(F)
-
                 for g in G:
                     i = 0
                     j = 0
@@ -312,7 +288,6 @@ class TriadicConcept:
                                 UF2 = [UF2]
                             if isinstance(UF3, str):
                                 UF3 = [UF3]
-
                             if isinstance(UG2, str):
                                 UG2 = [UG2]
                             if isinstance(UG3, str):
@@ -343,8 +318,6 @@ class TriadicConcept:
                         if g in G1:
                             G1.remove(g)
                 t_generator.update({source: G1})
-            # print("CONTEXT K1K2 UPDATED: ")
-            # print(context)
             feature_generator.update({source: context})
             context = pd.DataFrame()
             G = []
@@ -352,26 +325,6 @@ class TriadicConcept:
             F = []
             U3 = []
 
-        # print("RES" *100)
-        #     print("\nSOURCE: ", source, source_intent, source_modus)
-        #     print("TARGET: ", target, target_intent, target_modus)
-        #     print("t_generator: ")
-        #     print(t_generator[source])
-        # print("-"*15)
-        # for k, v in t_generator.items():
-        #     print(k)
-        #     print(v)
-        #     print()
-        # for k, v in feature_generator.items():
-        #     print(k)
-        #     print(v)
-        #     print()
-        # print("#"*50)
-        # current_concept.feature_generator = t_generator[source]
-        # return source, t_generator[source]
-        # print("TRIADIC CONCEPT: ", current_concept)
-        # print("t_generator KEYS SIZE: ", len(t_generator.keys()))
-        # print("t_generator VALUES SIZE: ", len(t_generator.values()))
         updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
             current_concept_extent)].feature_generator_candidates = t_generator
         
@@ -486,15 +439,51 @@ class TriadicConcept:
         
         return concept_extent, updadet_triadic_concept
     
-    def compute_feature_generator_validation(triadic_concepts, formal_context):
+    def compute_minimality_geature_generators(concept_extent, triadic_concepts):
+        f_gens = triadic_concepts[triadic_concepts.index(
+                set(concept_extent))].feature_generator
+        f_gens_to_check = f_gens[::-1].copy()
+        f_gens_final = f_gens.copy()
         
-        updated_triadic_concepts = []
+        def transform_to_list(item):
+            if isinstance(item, str):
+                return [item]
+            return item
+        
+        while len(f_gens_to_check) != 0:
+            generator_to_check = f_gens_to_check.pop()
+            for generator in f_gens:
+                if generator != generator_to_check and generator in f_gens_final and generator_to_check in f_gens_final:
+                    intent_gen, modus_gen = generator
+                    intent_gen_check, modus_gen_check = generator_to_check
+                    
+                    intent_gen = transform_to_list(intent_gen)
+                    modus_gen = transform_to_list(modus_gen)
+                    intent_gen_check = transform_to_list(intent_gen_check)
+                    modus_gen_check = transform_to_list(modus_gen_check)
+                
+                    if set(intent_gen_check).issubset(set(intent_gen)) and set(modus_gen_check).issubset(set(modus_gen)):
+                        if generator in f_gens_final:
+                            f_gens_final.remove(generator)
+        
+        updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
+            concept_extent)].feature_generator_minimal = f_gens_final
+        
+        return concept_extent, updadet_triadic_concept
+    
+    
+    def compute_feature_generator_validation(triadic_concepts, formal_context):
         
         ext_uniques = [concept.extent for concept in triadic_concepts]
         
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(TriadicConcept.validade_feature_generator_candidates, zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context))):
             triadic_concepts[triadic_concepts.index(set(result[0]))].feature_generator = result[1]
+        pool.close()
+        
+        pool = ThreadPool(PROCESSES)
+        for result in pool.starmap(TriadicConcept.compute_minimality_geature_generators, zip(ext_uniques, repeat(triadic_concepts))):
+            triadic_concepts[triadic_concepts.index(set(result[0]))].feature_generator_minimal = result[1]
         pool.close()
         
         return triadic_concepts
