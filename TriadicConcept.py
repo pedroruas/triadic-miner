@@ -34,7 +34,7 @@ class TriadicConcept:
 
     def __str__(self):
         return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}'
-
+    
     def __eq__(self, other):
         if other == self.extent:
             return True
@@ -374,7 +374,7 @@ class TriadicConcept:
         # print("t_generator VALUES SIZE: ", len(t_generator.values()))
         updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
             current_concept_extent)].feature_generator_candidates = t_generator
-
+        
         return updadet_triadic_concept
 
     def compute_f_generators_candidates(triadic_concepts, links, compute_minimality_for_infimum):
@@ -412,6 +412,7 @@ class TriadicConcept:
             ext_uniques = list(links_dict.keys())
             if EMPTY_SET in ext_uniques:
                 ext_uniques.remove(EMPTY_SET)
+                
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(TriadicConcept.f_generator, zip(ext_uniques, repeat(
                 links_dict), repeat(triadic_concepts))):
@@ -443,3 +444,57 @@ class TriadicConcept:
                                 str(_extent), [(str(_intent) + " " + str(_modus))])
 
         return Context(*formal_context)
+
+    def validade_feature_generator_candidates(concept_extent, triadic_concepts, formal_context):
+        
+        final_t_generator = []
+        f_gens = triadic_concepts[triadic_concepts.index(
+                set(concept_extent))].feature_generator_candidates
+        
+        def attributes_in_properties(attributes, formal_context):
+                for attribute in attributes:
+                    if attribute not in formal_context.properties:
+                        return False
+                return True
+        
+        def check_if_generator_belongs_to_extent(extent, generator, formal_context):
+            if not attributes_in_properties(generator, formal_context):
+                return False
+            extent_check = set(formal_context.extension(generator))
+            if extent_check != extent:
+                return False
+            else:
+                return True
+            
+        for generator in f_gens:
+            to_check = []
+            to_add = []
+            if isinstance(generator[0],str) and isinstance(generator[1],str):
+                to_check = [generator[0] + " " + generator[1]]
+                if check_if_generator_belongs_to_extent(concept_extent, to_check, formal_context) and generator not in final_t_generator:
+                    final_t_generator.extend([generator])
+            else:
+                to_check = []
+                for intent in generator[0]:
+                    for modus in generator[1]:
+                        to_check.extend([intent + " " + modus])
+                if check_if_generator_belongs_to_extent(concept_extent, to_check, formal_context) and generator not in final_t_generator:
+                            final_t_generator.extend([generator])
+        
+        updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
+            concept_extent)].feature_generator = final_t_generator
+        
+        return concept_extent, updadet_triadic_concept
+    
+    def compute_feature_generator_validation(triadic_concepts, formal_context):
+        
+        updated_triadic_concepts = []
+        
+        ext_uniques = [concept.extent for concept in triadic_concepts]
+        
+        pool = ThreadPool(PROCESSES)
+        for result in pool.starmap(TriadicConcept.validade_feature_generator_candidates, zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context))):
+            triadic_concepts[triadic_concepts.index(set(result[0]))].feature_generator = result[1]
+        pool.close()
+        
+        return triadic_concepts
