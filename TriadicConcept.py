@@ -195,7 +195,7 @@ class TriadicConcept:
         # print(context)
         return context
 
-    def f_generator(key, links_dict, triadic_concepts):
+    def f_generator(concept, links_dict, triadic_concepts):
 
         def compute_face_kth_successor(target_intent, target_modus):
             for intent_item, modus_item in zip(target_intent, target_modus):
@@ -219,11 +219,11 @@ class TriadicConcept:
         t_generator = {}
         dic_G = {}
 
-        val = links_dict[key]
+        successors_concepts = links_dict[concept]
 
-        for value in val:
-            target = frozenset(value)
-            source = frozenset(key)
+        for successor in successors_concepts:
+            target = frozenset(successor)
+            source = frozenset(concept)
             # print(triadic_concepts)
             current_concept = triadic_concepts[triadic_concepts.index(
                 set(source))]
