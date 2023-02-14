@@ -131,5 +131,5 @@ dmypy.json
 # vscode
 *.code-workspace
 
-iPred_Triadic_FINAL.py
+main_iPred_Triadic_FINAL.py
 requirements_iPred.txt
