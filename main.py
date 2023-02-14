@@ -92,12 +92,12 @@ def mine(file_path, compute_minimality_for_infimum):
         file_path)
     print("Number of Triadic Concepts:", len(triadic_concepts))
     time = Timer.stop()
-
+    
     # Timer.start("Reading triadic concepts with pandas (old)")
     # tc = old()
     # print("Number of Triadic Concepts: ", tc.shape[0])
     # time = Timer.stop()
-
+    
     # print("X"*100)
     # for c in triadic_concepts:
     #     print(c)
@@ -135,22 +135,31 @@ def mine(file_path, compute_minimality_for_infimum):
     # for x in links:
     #     print(x)
     Timer.start("Computing F-Generators")
-    updated_triadic_concepts = TriadicConcept.compute_f_generators_candidates(
-        triadic_concepts, links, compute_minimality_for_infimum)
+    updated_triadic_concepts = TriadicConcept.compute_f_generators_candidates(triadic_concepts, links, compute_minimality_for_infimum)
     time = Timer.stop()
     # print("Number of itens:", len(links_dict))
-
-    print("UPDATED TRIADIC CONCEPTS")
-    for c in updated_triadic_concepts:
-        print(c)
-        print()
+    
+    # print("FEATURE GENERATOR CANDIDATES")
+    # for c in updated_triadic_concepts:
+    #     print(c)
+    #     print()
     # print(triadic_concepts[triadic_concepts.index({'2'})])
     
     Timer.start("Computing Formal Context")
-    context = TriadicConcept.compute_formal_context(
-        updated_triadic_concepts)
+    formal_context = TriadicConcept.compute_formal_context(updated_triadic_concepts)
     time = Timer.stop()
-    # print(context)
+    # print(formal_context)
+    
+    Timer.start("Validating Feature Generators")
+    updated_triadic_concepts = TriadicConcept.compute_feature_generator_validation(updated_triadic_concepts, formal_context)
+    time = Timer.stop()
+    
+    # print("FEATURE GENERATORS VALIDATION")
+    # for c in updated_triadic_concepts:
+    #     print(c)
+    #     print()
+    
+    
 
 
 def main():
