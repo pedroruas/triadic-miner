@@ -15,7 +15,7 @@ def mine(file_path, compute_minimality_for_infimum):
         file_path)
     print("Number of Triadic Concepts:", len(triadic_concepts))
     time = Timer.stop()
-  
+    
     Timer.start("Creating triadic concepts faces")
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
@@ -40,31 +40,46 @@ def mine(file_path, compute_minimality_for_infimum):
     time = Timer.stop()
         
     Timer.start("Computing BCAI Implications")
-    updated_triadic_concepts = TriadicConcept.compute_BCAI_implications(updated_triadic_concepts)
+    updated_triadic_concepts, BCAI_implications = TriadicConcept.compute_BCAI_implications(updated_triadic_concepts)
     time = Timer.stop()
-    
-    # print("BCAI Implications")
-    # for c in updated_triadic_concepts:
-    #     print(c.extent)
-    #     for rule in c.BCAI_implications:
-    #         print(rule)
-    #     print()
     
     Timer.start("Computing BACI Implications")
-    updated_triadic_concepts = TriadicConcept.compute_BACI_implications(updated_triadic_concepts)
+    updated_triadic_concepts, BACI_implications = TriadicConcept.compute_BACI_implications(updated_triadic_concepts)
     time = Timer.stop()
     
-    # print("BACI Implications")
-    # for c in updated_triadic_concepts:
-    #     print(c.extent)
-    #     for rule in c.BACI_implications:
-    #         print(rule)
-    #     print()
+    Timer.start("Computing BCAAR Association Rules")
+    updated_triadic_concepts, BCAAR_rules = TriadicConcept.compute_BCAAR_association_rules(updated_triadic_concepts, links)
+    time = Timer.stop()
+    
+    Timer.start("Computing BACAR Association Rules")
+    updated_triadic_concepts, BACAR_rules = TriadicConcept.compute_BACAR_association_rules(updated_triadic_concepts, links)
+    time = Timer.stop()
+    
     
     print("TRIADIC CONCEPTS")
     for c in updated_triadic_concepts:
         print(c)
         print()
+    print()
+        
+    print("BCAI IMPLICATIONS")    
+    for rule in BCAI_implications:
+        print(rule)
+    print()
+        
+    print("BACI IMPLICATIONS")     
+    for rule in BACI_implications:
+        print(rule)
+    print()
+    
+    print("BCAAR RULES")    
+    for rule in BCAAR_rules:
+        print(rule)
+    print()
+    
+    print("BACAR RULES")    
+    for rule in BACAR_rules:
+        print(rule)
 
 def main():
     with open('configs.json') as json_file:
