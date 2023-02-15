@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# vscode
+*.code-workspace
+
+main_iPred_Triadic_FINAL.py
+requirements_iPred.txt
