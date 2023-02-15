@@ -11,7 +11,7 @@ from TriadicConcept import TriadicConcept
 from AssociationRules import AssociationRule
 
 
-def mine(file_path, compute_minimality_for_infimum):
+def triadic_miner(file_path, compute_minimality_for_infimum, save_hasse_diagram, file_name):
     Timer.start("Reading triadic concepts")
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
         file_path)
@@ -57,6 +57,10 @@ def mine(file_path, compute_minimality_for_infimum):
     BACAR_rules = AssociationRule.compute_BACAR_association_rules(updated_triadic_concepts, links)
     time = Timer.stop()
     
+    if save_hasse_diagram:
+        Timer.start("Creating the Hasse Diagram")
+        TriadicConcept.create_hasse_diagram(updated_triadic_concepts, links, file_name)
+        time = Timer.stop()
     
     # print("TRIADIC CONCEPTS")
     # for c in updated_triadic_concepts:
@@ -93,14 +97,17 @@ def main():
 
     for input_file_path in data['input_files']:
         _, file_name = os.path.split(input_file_path)
+        file_name = file_name.split(".data.out")[0]
         output_dir = data['output_dir']
         print(f'Running Triadic Miner on {input_file_path} file...')
         compute_minimality_for_infimum = data[
             'compute_feature_generators_minimality_test_for_infimum']
+        save_hasse_diagram = data[
+            'save_hasse_diagram']
         print()
         
         start_time = timeit.default_timer()
-        mine(input_file_path, compute_minimality_for_infimum)
+        triadic_miner(input_file_path, compute_minimality_for_infimum, save_hasse_diagram, file_name)
         end_time = timeit.default_timer()
         print("TOTAL TIME:  %0.4f SECONDS" % float(end_time - start_time))
 
