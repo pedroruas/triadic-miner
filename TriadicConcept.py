@@ -520,7 +520,7 @@ class TriadicConcept:
                     hasse.add_edge(str(generator), str(concept))
             
         hasse = pyyed.Graph()
-        for link in links:
+        for link in tqdm(links):
             concept, sucessor = link[0], link[1]
             concept_original = concept.copy()
             sucessor_original = sucessor.copy()
