@@ -11,7 +11,7 @@ EMPTY_SET = set([])
 @dataclass(slots=True, order=True)
 class AssociationRule:
     """Class that represents a association rule (including implications).
-        The folowing rules are beeing stored:
+        The folowing rules are beeing computed:
             - Biedermann Conditional Attribute Association Rule (BCAAR)
             - Biedermann Attributional Condition Association Rule (BACAR)
             - Biedermann Conditional Attribute Implication (BCAI)
