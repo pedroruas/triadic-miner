@@ -492,9 +492,7 @@ class TriadicConcept:
     def compute_BCAI_implications(triadic_concepts):
         
         updadet_triadic_concept = []
-        _number_triadic_concepts = len(triadic_concepts)
         _max_cardinality = max(concept.extent_size for concept in triadic_concepts)
-        
         
         def cast_to_list(item):
             if isinstance(item, str):
@@ -516,16 +514,56 @@ class TriadicConcept:
                 for item in concept_intent_modus:
                     _intent, _modus = item
                     if set(intent_generator).issubset(set(_intent)) and set(modus_generator).issubset(set(_modus)):
-                        implication_intent = set(_intent) - set(intent_generator)
-                        if implication_intent != EMPTY_SET:
-                            implication_intent = list(implication_intent)
+                        implication = set(_intent) - set(intent_generator)
+                        if implication != EMPTY_SET:
+                            implication = list(implication)
                             support = concept.extent_size / _max_cardinality
-                            rule = [intent_generator, modus_generator, implication_intent, [support]]
+                            rule = [intent_generator, modus_generator, implication, [support]]
                             if rule not in rules:
                                 rules.append(rule)
             
             triadic_concepts[triadic_concepts.index(
             extent)].BCAI_implications = rules
+            updadet_triadic_concept.append(triadic_concepts[triadic_concepts.index(
+            extent)])
+                
+        return updadet_triadic_concept
+    
+    def compute_BACI_implications(triadic_concepts):
+    
+        updadet_triadic_concept = []
+        _max_cardinality = max(concept.extent_size for concept in triadic_concepts)
+        
+        def cast_to_list(item):
+            if isinstance(item, str):
+                return [item]
+            return item
+        
+        for concept in triadic_concepts:
+            rules = []
+            extent, intent, modus = concept.extent, concept.intent, concept.modus
+            intent = cast_to_list(intent)
+            modus = cast_to_list(modus)
+            for generator in concept.feature_generator_minimal:
+                intent_generator, modus_generator = generator[0], generator[1]
+                intent_generator = cast_to_list(intent_generator)
+                modus_generator = cast_to_list(modus_generator)
+                
+                concept_intent_modus = zip(intent, modus)
+                concept_intent_modus = sorted(concept_intent_modus, key=lambda x: (len(x[1])), reverse=True)
+                for item in concept_intent_modus:
+                    _intent, _modus = item
+                    if set(intent_generator).issubset(set(_intent)) and set(modus_generator).issubset(set(_modus)):
+                        implication = set(_modus) - set(modus_generator)
+                        if implication != EMPTY_SET:
+                            implication = list(implication)
+                            support = concept.extent_size / _max_cardinality
+                            rule = [modus_generator, intent_generator, implication, [support]]
+                            if rule not in rules:
+                                rules.append(rule)
+            
+            triadic_concepts[triadic_concepts.index(
+            extent)].BACI_implications = rules
             updadet_triadic_concept.append(triadic_concepts[triadic_concepts.index(
             extent)])
                 
