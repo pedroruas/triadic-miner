@@ -6,7 +6,9 @@
 import json
 import os
 from Timer import Timer
+import timeit
 from TriadicConcept import TriadicConcept
+from AssociationRules import AssociationRule
 
 
 def mine(file_path, compute_minimality_for_infimum):
@@ -40,46 +42,50 @@ def mine(file_path, compute_minimality_for_infimum):
     time = Timer.stop()
         
     Timer.start("Computing BCAI Implications")
-    updated_triadic_concepts, BCAI_implications = TriadicConcept.compute_BCAI_implications(updated_triadic_concepts)
+    BCAI_implications = AssociationRule.compute_BCAI_implications(updated_triadic_concepts)
     time = Timer.stop()
     
     Timer.start("Computing BACI Implications")
-    updated_triadic_concepts, BACI_implications = TriadicConcept.compute_BACI_implications(updated_triadic_concepts)
+    BACI_implications = AssociationRule.compute_BACI_implications(updated_triadic_concepts)
     time = Timer.stop()
     
     Timer.start("Computing BCAAR Association Rules")
-    updated_triadic_concepts, BCAAR_rules = TriadicConcept.compute_BCAAR_association_rules(updated_triadic_concepts, links)
+    BCAAR_rules = AssociationRule.compute_BCAAR_association_rules(updated_triadic_concepts, links)
     time = Timer.stop()
     
     Timer.start("Computing BACAR Association Rules")
-    updated_triadic_concepts, BACAR_rules = TriadicConcept.compute_BACAR_association_rules(updated_triadic_concepts, links)
+    BACAR_rules = AssociationRule.compute_BACAR_association_rules(updated_triadic_concepts, links)
     time = Timer.stop()
     
     
-    print("TRIADIC CONCEPTS")
-    for c in updated_triadic_concepts:
-        print(c)
-        print()
-    print()
+    # print("TRIADIC CONCEPTS")
+    # for c in updated_triadic_concepts:
+    #     print(c)
+    #     print()
+    # print()
         
-    print("BCAI IMPLICATIONS")    
-    for rule in BCAI_implications:
-        print(rule)
-    print()
+    # print("BCAI IMPLICATIONS")    
+    # for rule in BCAI_implications:
+    #     print(rule)
+    #     print()
+    # print()
         
-    print("BACI IMPLICATIONS")     
-    for rule in BACI_implications:
-        print(rule)
-    print()
+    # print("BACI IMPLICATIONS")     
+    # for rule in BACI_implications:
+    #     print(rule)
+    #     print()
+    # print()
     
-    print("BCAAR RULES")    
-    for rule in BCAAR_rules:
-        print(rule)
-    print()
+    # print("BCAAR RULES")    
+    # for rule in BCAAR_rules:
+    #     print(rule)
+    #     print()
+    # print()
     
-    print("BACAR RULES")    
-    for rule in BACAR_rules:
-        print(rule)
+    # print("BACAR RULES")    
+    # for rule in BACAR_rules:
+    #     print(rule)
+    #     print()
 
 def main():
     with open('configs.json') as json_file:
@@ -93,7 +99,10 @@ def main():
             'compute_feature_generators_minimality_test_for_infimum']
         print()
         
+        start_time = timeit.default_timer()
         mine(input_file_path, compute_minimality_for_infimum)
+        end_time = timeit.default_timer()
+        print("TOTAL TIME:  %0.4f SECONDS" % float(end_time - start_time))
 
 
 if __name__ == "__main__":
