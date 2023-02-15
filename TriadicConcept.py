@@ -29,12 +29,14 @@ class TriadicConcept:
     feature_generator: list[list] = field(default_factory=list)
     feature_generator_minimal: list[list] = field(default_factory=list)
     feature_generator_candidates: list[list] = field(default_factory=list)
+    BCAI_implications: list = field(default_factory=list)
+    BACI_implications: list = field(default_factory=list)
     
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}'
+        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}\nBCAI Implications: {self.BCAI_implications}\nBACI Implications: {self.BACI_implications}'
     
     def __eq__(self, other):
         if other == self.extent:
@@ -445,7 +447,7 @@ class TriadicConcept:
         f_gens_to_check = f_gens[::-1].copy()
         f_gens_final = f_gens.copy()
         
-        def transform_to_list(item):
+        def cast_to_list(item):
             if isinstance(item, str):
                 return [item]
             return item
@@ -457,10 +459,10 @@ class TriadicConcept:
                     intent_gen, modus_gen = generator
                     intent_gen_check, modus_gen_check = generator_to_check
                     
-                    intent_gen = transform_to_list(intent_gen)
-                    modus_gen = transform_to_list(modus_gen)
-                    intent_gen_check = transform_to_list(intent_gen_check)
-                    modus_gen_check = transform_to_list(modus_gen_check)
+                    intent_gen = cast_to_list(intent_gen)
+                    modus_gen = cast_to_list(modus_gen)
+                    intent_gen_check = cast_to_list(intent_gen_check)
+                    modus_gen_check = cast_to_list(modus_gen_check)
                 
                     if set(intent_gen_check).issubset(set(intent_gen)) and set(modus_gen_check).issubset(set(modus_gen)):
                         if generator in f_gens_final:
@@ -470,7 +472,6 @@ class TriadicConcept:
             concept_extent)].feature_generator_minimal = f_gens_final
         
         return concept_extent, updadet_triadic_concept
-    
     
     def compute_feature_generator_validation(triadic_concepts, formal_context):
         
@@ -487,3 +488,45 @@ class TriadicConcept:
         pool.close()
         
         return triadic_concepts
+    
+    def compute_BCAI_implications(triadic_concepts):
+        
+        updadet_triadic_concept = []
+        _number_triadic_concepts = len(triadic_concepts)
+        _max_cardinality = max(concept.extent_size for concept in triadic_concepts)
+        
+        
+        def cast_to_list(item):
+            if isinstance(item, str):
+                return [item]
+            return item
+        
+        for concept in triadic_concepts:
+            rules = []
+            extent, intent, modus = concept.extent, concept.intent, concept.modus
+            intent = cast_to_list(intent)
+            modus = cast_to_list(modus)
+            for generator in concept.feature_generator_minimal:
+                intent_generator, modus_generator = generator[0], generator[1]
+                intent_generator = cast_to_list(intent_generator)
+                modus_generator = cast_to_list(modus_generator)
+                
+                concept_intent_modus = zip(intent, modus)
+                concept_intent_modus = sorted(concept_intent_modus, key=lambda x: (len(x[0])), reverse=True)
+                for item in concept_intent_modus:
+                    _intent, _modus = item
+                    if set(intent_generator).issubset(set(_intent)) and set(modus_generator).issubset(set(_modus)):
+                        implication_intent = set(_intent) - set(intent_generator)
+                        if implication_intent != EMPTY_SET:
+                            implication_intent = list(implication_intent)
+                            support = concept.extent_size / _max_cardinality
+                            rule = [intent_generator, modus_generator, implication_intent, [support]]
+                            if rule not in rules:
+                                rules.append(rule)
+            
+            triadic_concepts[triadic_concepts.index(
+            extent)].BCAI_implications = rules
+            updadet_triadic_concept.append(triadic_concepts[triadic_concepts.index(
+            extent)])
+                
+        return updadet_triadic_concept
