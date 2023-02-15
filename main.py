@@ -33,6 +33,7 @@ def mine(file_path, compute_minimality_for_infimum):
     Timer.start("Computing Formal Context")
     formal_context = TriadicConcept.compute_formal_context(updated_triadic_concepts)
     time = Timer.stop()
+    # print(formal_context)
     
     Timer.start("Validating Feature Generators")
     updated_triadic_concepts = TriadicConcept.compute_feature_generator_validation(updated_triadic_concepts, formal_context)
@@ -42,17 +43,28 @@ def mine(file_path, compute_minimality_for_infimum):
     updated_triadic_concepts = TriadicConcept.compute_BCAI_implications(updated_triadic_concepts)
     time = Timer.stop()
     
-    print("TRIADIC CONCEPTS")
-    for c in updated_triadic_concepts:
-        print(c)
-        print()
-    
     # print("BCAI Implications")
     # for c in updated_triadic_concepts:
     #     print(c.extent)
     #     for rule in c.BCAI_implications:
     #         print(rule)
     #     print()
+    
+    Timer.start("Computing BACI Implications")
+    updated_triadic_concepts = TriadicConcept.compute_BACI_implications(updated_triadic_concepts)
+    time = Timer.stop()
+    
+    # print("BACI Implications")
+    # for c in updated_triadic_concepts:
+    #     print(c.extent)
+    #     for rule in c.BACI_implications:
+    #         print(rule)
+    #     print()
+    
+    print("TRIADIC CONCEPTS")
+    for c in updated_triadic_concepts:
+        print(c)
+        print()
 
 def main():
     with open('configs.json') as json_file:
