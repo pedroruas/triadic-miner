@@ -10,6 +10,7 @@ from multiprocessing.pool import ThreadPool
 from itertools import repeat
 from concepts import Definition, Context
 import pyyed
+from itertools import chain, combinations
 
 EMPTY_SET = set([])
 PROCESSES = 8  # Amount of threads to be used while computing and validating Feature-Generators
@@ -25,12 +26,13 @@ class TriadicConcept:
     feature_generator: list[list] = field(default_factory=list)
     feature_generator_minimal: list[list] = field(default_factory=list)
     feature_generator_candidates: list[list] = field(default_factory=list)
+    concept_stability: list[list] = field(default_factory=list)
     
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}'
+        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}\nConcept Stability: {self.concept_stability}'
     
     def __eq__(self, other):
         if other == self.extent:
@@ -536,3 +538,80 @@ class TriadicConcept:
             hasse.add_edge(str(concept), str(sucessor))
             
         hasse.write_graph('output/' + file_name + '_hasse_diagram.graphml', pretty_print=True)
+        
+    def concept_stability_calculation(concept, triadic_concepts, formal_context):
+        
+        def powerset(iterable):
+            "list(powerset([1,2,3])) --> [(), (1,), (2,), (3,), (1,2), (1,3), (2,3), (1,2,3)] "
+            s = list(iterable)
+            return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+        
+        context = Definition()
+        list_concept_stability = []
+        count_concept_stability = 0
+        extent = triadic_concepts[triadic_concepts.index(concept)].extent
+        intent = triadic_concepts[triadic_concepts.index(concept)].intent
+        modus = triadic_concepts[triadic_concepts.index(concept)].modus
+        extent = [x for x in extent]
+        
+        if extent != []:
+            for item in zip(intent, modus):
+                intent_item, modus_item = item
+                if len(extent) == 1:
+                    list_concept_stability.append([list(extent), intent_item, modus_item, 0.5])
+                else:
+                    powerset_ext = powerset(extent)
+                    for ext in powerset_ext:
+                        if list(ext) != []:
+                            if len(ext) == 1:
+                                intention = formal_context.intension(ext)
+                                for element in list(intention):
+                                    intent_part, modus_part = element.split()
+                                    context.add_object(str(intent_part), [
+                                                str(modus_part), ])
+                            else:
+                                intention = formal_context.intension(ext,)
+                                
+                                # When the powerset of some EXTENT is computed, is it possible to create some combination of extents that does not have any shared feature. In this sense, this IF test will just skip these extents that doesn't share any feature.
+                                if list(intention) == []:
+                                    continue
+                                for element in list(intention):
+                                    intent_part, modus_part = element.split()
+                                    context.add_object(str(intent_part), [
+                                                str(modus_part), ])
+                            _context = Context(*context)
+                            lattice = _context.lattice
+                            for intent_subset, modus_subset in lattice:
+                                if set(list(intent_item)) == set(list(intent_subset)) and set(list(modus_item)) == set(list(modus_subset)):
+                                    count_concept_stability += 1
+                            context = Definition()
+                    if list(ext) != []:
+                        list_concept_stability.append(
+                            [list(extent), intent_item, modus_item, count_concept_stability/2**len(extent)])
+                    count_concept_stability = 0
+        
+        return list_concept_stability
+    
+    def compute_concept_stability(triadic_concepts, formal_context):
+        
+        ext_uniques = [concept.extent for concept in triadic_concepts]
+        
+        pool = ThreadPool(PROCESSES)
+        list_concept_stability_final = pool.starmap(TriadicConcept.concept_stability_calculation, zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context)))
+        pool.close()
+        
+        for result in list_concept_stability_final:
+            _extent = EMPTY_SET
+            scores = []
+            if result != []:
+                for concept in result:
+                    extent = frozenset(concept[0])
+                    _extent = extent.copy()
+                    intent = list(concept[1])
+                    modus = list(concept[2])
+                    concept_stability = concept[3]
+                    scores.append([intent, modus, concept_stability])
+            triadic_concepts[triadic_concepts.index(_extent)].concept_stability = scores
+            
+        return triadic_concepts
+
