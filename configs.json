@@ -8,5 +8,6 @@
   ],
   "output_dir": "miner_output/",
   "compute_feature_generators_minimality_test_for_infimum": false,
+  "compute_concept_stability" : false,
   "save_hasse_diagram": false
 }
