@@ -12,8 +12,7 @@ from AssociationRules import AssociationRule
 from Report import Report
 
 
-def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, compute_concept_stability,
-                  compute_separation_index, save_hasse_diagram, report_file_path, triadic_concepts_file_path, links_concepts_file_path, feature_generators_file_path, BCAI_implications_file_path, BACI_implications_file_path, BCAAR_rules_file_path, BACAR_rules_file_path):
+def triadic_miner(file_path, file_name, minimum_support_rules, minimum_confidence_rules, compute_feature_generators_for_infimum, compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path, triadic_concepts_file_path, links_concepts_file_path, feature_generators_file_path, BCAI_implications_file_path, BACI_implications_file_path, BCAAR_rules_file_path, BACAR_rules_file_path, concept_stability_file_path, separation_index_file_path):
 
     report = Report(report_file_path, file_name)
     report.check_output_folder()
@@ -48,7 +47,6 @@ def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, 
         updated_triadic_concepts)
     time = Timer.stop()
     report.add_module_time('Computing Formal Context', time)
-    # print(formal_context)
 
     Timer.start("Validating Feature Generators")
     updated_triadic_concepts = TriadicConcept.compute_feature_generator_validation(
@@ -58,25 +56,25 @@ def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, 
 
     Timer.start("Computing BCAI Implications")
     BCAI_implications = AssociationRule.compute_BCAI_implications(
-        updated_triadic_concepts)
+        updated_triadic_concepts, minimum_support_rules)
     time = Timer.stop()
     report.add_module_time('Computing BCAI Implications', time)
-
+    
     Timer.start("Computing BACI Implications")
     BACI_implications = AssociationRule.compute_BACI_implications(
-        updated_triadic_concepts)
+        updated_triadic_concepts, minimum_support_rules)
     time = Timer.stop()
     report.add_module_time('Computing BACI Implications', time)
 
     Timer.start("Computing BCAAR Association Rules")
     BCAAR_rules = AssociationRule.compute_BCAAR_association_rules(
-        updated_triadic_concepts, links)
+        updated_triadic_concepts, minimum_support_rules, minimum_confidence_rules, links)
     time = Timer.stop()
     report.add_module_time('Computing BCAAR Association Rules', time)
 
     Timer.start("Computing BACAR Association Rules")
     BACAR_rules = AssociationRule.compute_BACAR_association_rules(
-        updated_triadic_concepts, links)
+        updated_triadic_concepts, minimum_support_rules, minimum_confidence_rules, links)
     time = Timer.stop()
     report.add_module_time('Computing BACAR Association Rules', time)
 
@@ -101,35 +99,6 @@ def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, 
         time = Timer.stop()
         report.add_module_time('Creating the Hasse Diagram', time)
 
-    # print("TRIADIC CONCEPTS")
-    # for c in updated_triadic_concepts:
-    #     print(c)
-    #     print()
-    # print()
-
-    # print("BCAI IMPLICATIONS")
-    # for rule in BCAI_implications:
-    #     print(rule)
-    #     print()
-    # print()
-
-    # print("BACI IMPLICATIONS")
-    # for rule in BACI_implications:
-    #     print(rule)
-    #     print()
-    # print()
-
-    # print("BCAAR RULES")
-    # for rule in BCAAR_rules:
-    #     print(rule)
-    #     print()
-    # print()
-
-    # print("BACAR RULES")
-    # for rule in BACAR_rules:
-    #     print(rule)
-    #     print()
-
     report.save_report()
     report.save_triadic_concepts(
         updated_triadic_concepts, triadic_concepts_file_path)
@@ -142,9 +111,16 @@ def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, 
         BACI_implications, BACI_implications_file_path)
     report.save_BCAAR_rules(BCAAR_rules, BCAAR_rules_file_path)
     report.save_BACAR_rules(BACAR_rules, BACAR_rules_file_path)
+    if compute_concept_stability:
+        report.save_concept_stability(
+            updated_triadic_concepts, concept_stability_file_path)
+    if compute_separation_index:
+        report.save_separation_index(
+            triadic_concepts, separation_index_file_path)
 
 
 def main():
+
     with open('configs.json') as json_file:
         data = json.load(json_file)
 
@@ -152,14 +128,16 @@ def main():
         _, file_name = os.path.split(input_file_path)
         file_name = file_name.split(".data.out")[0]
         output_dir = data['output_dir']
-        print(f'Running Triadic Miner on {input_file_path} file...')
+        print(f'Running Triadic Miner on {input_file_path} file...\n')
+        minimum_support_rules = data['minimum_support_rules']
+        minimum_confidence_rules = data['minimum_confidence_rules']
         compute_feature_generators_for_infimum = data[
             'compute_feature_generators_for_infimum']
         compute_concept_stability = data['compute_concept_stability']
         compute_separation_index = data['compute_separation_index']
         save_hasse_diagram = data[
             'save_hasse_diagram']
-        print()
+
         report_file_path = '{0}{1}.report'.format(output_dir, file_name)
         triadic_concepts_file_path = '{0}{1}.concepts'.format(
             output_dir, file_name)
@@ -174,12 +152,12 @@ def main():
             output_dir, file_name)
         BACAR_rules_file_path = '{0}{1}.BACAR_rules'.format(
             output_dir, file_name)
+        concept_stability_file_path = '{0}{1}.concept_stability'.format(
+            output_dir, file_name)
+        separation_index_file_path = '{0}{1}.separation_index'.format(
+            output_dir, file_name)
 
-        # start_time = timeit.default_timer()
-        triadic_miner(input_file_path, file_name, compute_feature_generators_for_infimum,
-                      compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path, triadic_concepts_file_path, links_concepts_file_path, feature_generators_file_path, BCAI_implications_file_path, BACI_implications_file_path, BCAAR_rules_file_path, BACAR_rules_file_path)
-        # end_time = timeit.default_timer()
-        # print("TOTAL TIME:  %0.4f SECONDS" % float(end_time - start_time))
+        triadic_miner(input_file_path, file_name, minimum_support_rules, minimum_confidence_rules,  compute_feature_generators_for_infimum, compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path, triadic_concepts_file_path, links_concepts_file_path, feature_generators_file_path, BCAI_implications_file_path, BACI_implications_file_path, BCAAR_rules_file_path, BACAR_rules_file_path, concept_stability_file_path, separation_index_file_path)
 
 
 if __name__ == "__main__":
