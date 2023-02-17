@@ -23,12 +23,18 @@ class Report():
         if not os.path.isdir(self.file_path.split('/')[0]):
             os.mkdir(self.file_path.split('/')[0])
 
+    def write_header(file, title, number_identation):
+
+        file.write('*' + '='*75 + '*\n')
+        file.write('\t'*number_identation + title + '\n')
+        file.write('*' + '='*75 + '*' + '\n\n')
+
     def save_report(self):
         self.check_output_folder()
 
         file = open(self.file_path, 'w', encoding='utf-8')
-        file.write(
-            'EXECUTION REPORT FOR FILE: {0}\n\n\n'.format(self.file_name))
+        Report.write_header(
+            file, 'EXECUTION TIME REPORT FOR FILE: {0}'.format(self.file_name), 3)
 
         total_time = 0
         for module in self.module_time:
@@ -40,16 +46,10 @@ class Report():
             '{:.4}'.format(total_time), '{:.4}'.format(total_time/60), '{:.4}'.format(total_time/3600)))
         file.close()
 
-    def write_header(file, title):
-
-        file.write('*' + '='*75 + '*\n')
-        file.write('\t'*7 + title + '\n')
-        file.write('*' + '='*75 + '*' + '\n\n')
-
     def save_links(self, links, links_concepts_file_path):
-        
+
         file = open(links_concepts_file_path, 'w', encoding='utf-8')
-        Report.write_header(file, 'LINKS COMPUTED BY T-iPRED')
+        Report.write_header(file, 'LINKS COMPUTED BY T-iPRED', 7)
 
         for link in links:
             concept, target = link[1], link[0]
@@ -65,8 +65,7 @@ class Report():
     def save_feature_generators(self, triadic_concepts, feature_generators_file_path):
 
         file = open(feature_generators_file_path, 'w', encoding='utf-8')
-        file.write
-        Report.write_header(file, 'FEATURES GENERATORS')
+        Report.write_header(file, 'FEATURES GENERATORS', 7)
 
         for concept in triadic_concepts:
             extent = concept.extent
@@ -86,4 +85,76 @@ class Report():
             else:
                 file.write('[]\n')
             file.write('\n\n')
+        file.close()
+
+    def save_BCAI_implications(self, BCAI_implications, BCAI_implications_file_path):
+
+        file = open(BCAI_implications_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'BCAI IMPLICATIONS', 7)
+
+        for rule in BCAI_implications:
+            left_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
+            right_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.consequent))]))
+            condition = str(
+                ', '.join([', '.join(x for x in sorted(rule.condition))]))
+            support = rule.support
+            confidence = rule.confidence
+            file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
+                left_part, right_part, condition, support, confidence))
+        file.close()
+
+    def save_BACI_implications(self, BACI_implications, BACI_implications_file_path):
+
+        file = open(BACI_implications_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'BACI IMPLICATIONS', 7)
+
+        for rule in BACI_implications:
+            left_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
+            right_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.consequent))]))
+            condition = str(
+                ', '.join([', '.join(x for x in sorted(rule.condition))]))
+            support = rule.support
+            confidence = rule.confidence
+            file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
+                left_part, right_part, condition, support, confidence))
+        file.close()
+    
+    def save_BCAAR_rules(self, BCAAR_rules, BCAAR_rules_file_path):
+        
+        file = open(BCAAR_rules_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'BCAAR ASSOCIATION RULES', 6)
+        
+        for rule in BCAAR_rules:
+            left_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
+            right_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.consequent))]))
+            condition = str(
+                ', '.join([', '.join(x for x in sorted(rule.condition))]))
+            support = rule.support
+            confidence = rule.confidence
+            file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
+                left_part, right_part, condition, support, confidence))
+        file.close()
+    
+    def save_BACAR_rules(self, BACAR_rules, BACAR_rules_file_path):
+        
+        file = open(BACAR_rules_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'BACAR ASSOCIATION RULES', 6)
+        
+        for rule in BACAR_rules:
+            left_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
+            right_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.consequent))]))
+            condition = str(
+                ', '.join([', '.join(x for x in sorted(rule.condition))]))
+            support = rule.support
+            confidence = rule.confidence
+            file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
+                left_part, right_part, condition, support, confidence))
         file.close()
