@@ -539,9 +539,9 @@ class TriadicConcept:
                             context = Definition()
                     if list(ext) != []:
                         list_concept_stability.append(
-                            [list(extent), intent_item, modus_item, count_concept_stability/2**len(extent)])
+                            [list(extent), intent_item, modus_item, round(count_concept_stability/2**len(extent), 3)])
                     count_concept_stability = 0
-
+        
         return list_concept_stability
 
     def compute_concept_stability(triadic_concepts, formal_context):
@@ -585,7 +585,7 @@ class TriadicConcept:
         count_intent = 0
         count_modus = 0
 
-        for concept in triadic_concepts:
+        for concept in tqdm(triadic_concepts):
             extent = [x for x in concept.extent]
             intent, modus = concept.intent, concept.modus
             if extent != []:
@@ -621,7 +621,7 @@ class TriadicConcept:
                                     list_appear_extent_intent_modus.append(
                                         [[str(element_extent)], [str(element_intent)+" "+str(element_modus)]])
 
-        for concept in triadic_concepts:
+        for concept in tqdm(triadic_concepts):
             extent = [x for x in concept.extent]
             intent, modus = concept.intent, concept.modus
             if extent != []:
@@ -671,7 +671,7 @@ class TriadicConcept:
                 modus = list(result[2])
                 separation_index = result[3]
                 triadic_concepts[triadic_concepts.index(extent)].separation_index.append([
-                    intent, modus, separation_index])
+                    intent, modus, round(separation_index, 3)])
 
         return triadic_concepts
 
@@ -725,10 +725,10 @@ class TriadicConcept:
                 sucessor = 'ø'
             concept = str(', '.join(x for x in sorted(concept)))
             sucessor = str(', '.join(x for x in sorted(sucessor)))
-            
+
             check_concept_is_in_hasse(concept, concept_original)
             check_concept_is_in_hasse(sucessor, sucessor_original)
             hasse.add_edge(str(concept), str(sucessor))
-        
+
         hasse.write_graph('output/' + file_name +
                           '_hasse_diagram.graphml', pretty_print=True)
