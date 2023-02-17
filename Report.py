@@ -46,12 +46,12 @@ class Report():
             '{:.4}'.format(total_time), '{:.4}'.format(total_time/60), '{:.4}'.format(total_time/3600)))
         file.close()
 
-    def save_triadic_concepts(self, updated_triadic_concepts, triadic_concepts_file_path):
+    def save_triadic_concepts(self, triadic_concepts, triadic_concepts_file_path):
 
         file = open(triadic_concepts_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'TRIADIC CONCEPTS', 7)
 
-        for concept in updated_triadic_concepts:
+        for concept in triadic_concepts:
             extent = concept.extent
             intent = concept.intent
             modus = concept.modus
@@ -182,4 +182,58 @@ class Report():
             confidence = rule.confidence
             file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
                 left_part, right_part, condition, support, confidence))
+        file.close()
+
+    def save_concept_stability(self, triadic_concepts, concept_stability_file_path):
+
+        file = open(concept_stability_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'CONCEPT STABILITY', 7)
+
+        for concept in triadic_concepts:
+            extent = concept.extent
+            if extent == EMPTY_SET:
+                extent = 'ø'
+            extent = str(
+                ', '.join([', '.join(x for x in sorted(extent))]))
+            file.write('EXTENT: {0}\n'.format(extent))
+            stability = concept.concept_stability
+            if not stability == []:
+                for attribute in stability:
+                    intent = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[0]))]))
+                    modus = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[1]))]))
+                    concept_stability = attribute[2]
+                    file.write(
+                        '({0} - {1}) = {2}\n'.format(intent, modus, concept_stability))
+            else:
+                file.write('[]\n')
+            file.write('\n')
+        file.close()
+
+    def save_separation_index(self, triadic_concepts, separation_index_file_path):
+
+        file = open(separation_index_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'SEPARATION INDEX', 7)
+
+        for concept in triadic_concepts:
+            extent = concept.extent
+            if extent == EMPTY_SET:
+                extent = 'ø'
+            extent = str(
+                ', '.join([', '.join(x for x in sorted(extent))]))
+            file.write('EXTENT: {0}\n'.format(extent))
+            separation_idx = concept.separation_index
+            if not separation_idx == []:
+                for attribute in separation_idx:
+                    intent = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[0]))]))
+                    modus = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[1]))]))
+                    separation = round(attribute[2], 3)
+                    file.write(
+                        '({0} - {1}) = {2}\n'.format(intent, modus, separation))
+            else:
+                file.write('[]\n')
+            file.write('\n')
         file.close()
