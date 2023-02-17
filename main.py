@@ -13,9 +13,10 @@ from Report import Report
 
 
 def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, compute_concept_stability,
-                  compute_separation_index, save_hasse_diagram, report_file_path):
+                  compute_separation_index, save_hasse_diagram, report_file_path, links_concepts_file_path, feature_generators_file_path):
 
     report = Report(report_file_path, file_name)
+    report.check_output_folder()
 
     Timer.start("Reading Triadic Concepts")
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
@@ -23,7 +24,7 @@ def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, 
     print("Number of Triadic Concepts:", len(triadic_concepts))
     time = Timer.stop()
     report.add_module_time('Reading Triadic Concepts', time)
-    
+
     Timer.start("Creating Triadic Concepts Faces")
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
@@ -101,6 +102,8 @@ def triadic_miner(file_path, file_name, compute_feature_generators_for_infimum, 
         report.add_module_time('Creating the Hasse Diagram', time)
 
     report.save_report()
+    report.save_links(links, links_concepts_file_path)
+    report.save_feature_generators(updated_triadic_concepts, feature_generators_file_path)
     # print("TRIADIC CONCEPTS")
     # for c in updated_triadic_concepts:
     #     print(c)
@@ -148,11 +151,14 @@ def main():
             'save_hasse_diagram']
         print()
         report_file_path = '{0}{1}.report'.format(output_dir, file_name)
-        start_time = timeit.default_timer()
+        links_concepts_file_path = '{0}{1}.links'.format(output_dir, file_name)
+        feature_generators_file_path = '{0}{1}.generators'.format(output_dir, file_name)
+
+        # start_time = timeit.default_timer()
         triadic_miner(input_file_path, file_name, compute_feature_generators_for_infimum,
-                      compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path)
-        end_time = timeit.default_timer()
-        print("TOTAL TIME:  %0.4f SECONDS" % float(end_time - start_time))
+                      compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path, links_concepts_file_path, feature_generators_file_path)
+        # end_time = timeit.default_timer()
+        # print("TOTAL TIME:  %0.4f SECONDS" % float(end_time - start_time))
 
 
 if __name__ == "__main__":
