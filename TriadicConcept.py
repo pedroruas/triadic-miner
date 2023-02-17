@@ -729,8 +729,6 @@ class TriadicConcept:
             check_concept_is_in_hasse(concept, concept_original)
             check_concept_is_in_hasse(sucessor, sucessor_original)
             hasse.add_edge(str(concept), str(sucessor))
-
-        if not os.path.isdir("output/"):
-            os.mkdir("output")
+        
         hasse.write_graph('output/' + file_name +
                           '_hasse_diagram.graphml', pretty_print=True)
