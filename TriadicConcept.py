@@ -27,12 +27,13 @@ class TriadicConcept:
     feature_generator_minimal: list[list] = field(default_factory=list)
     feature_generator_candidates: list[list] = field(default_factory=list)
     concept_stability: list[list] = field(default_factory=list)
+    separation_index: list[list] = field(default_factory=list)
     
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}\nConcept Stability: {self.concept_stability}'
+        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}\nConcept Stability: {self.concept_stability}\nSeparation Index: {self.separation_index}'
     
     def __eq__(self, other):
         if other == self.extent:
@@ -328,7 +329,7 @@ class TriadicConcept:
         
         return updadet_triadic_concept
 
-    def compute_f_generators_candidates(triadic_concepts, links, compute_minimality_for_infimum):
+    def compute_f_generators_candidates(triadic_concepts, links, compute_feature_generators_for_infimum):
 
         def compute_f_generators_supremum(triadic_concepts):
             triadic_concepts = sorted(
@@ -359,7 +360,7 @@ class TriadicConcept:
         updated_triadic_concepts = []
         links_dict = TriadicConcept.list_of_links_to_dict(links)
         ext_uniques = list(links_dict.keys())
-        if not compute_minimality_for_infimum:
+        if not compute_feature_generators_for_infimum:
             ext_uniques = list(links_dict.keys())
             if EMPTY_SET in ext_uniques:
                 ext_uniques.remove(EMPTY_SET)
@@ -484,60 +485,6 @@ class TriadicConcept:
         pool.close()
         
         return triadic_concepts
-    
-    def create_hasse_diagram(triadic_concepts, links, file_name):
-        
-        nodes = []
-        nodes_gen = []
-        
-        def format_generators(generators):
-            t_gens = []
-            if generators == []:
-                return None
-            for v in generators:
-                if isinstance(v[0], list):
-                    intent = [', '.join(x for x in sorted(v[0]))]
-                    modus = [', '.join(x for x in sorted(v[1]))]
-                    t_gen = str("(" + ', '.join([x for x in intent])) + " - " + str(', '.join([x for x in modus]))+")"
-                    t_gens.append(t_gen)
-                else:
-                    t_gen = "(" + str(v[0]) + " - " + str(v[1]) + ")"
-                    t_gens.append(t_gen)
-            if len(t_gens) > 1:
-                return ["\n".join(x for x in t_gens)][0]
-            else:
-                return t_gens[0]
-            
-        def check_concept_is_in_hasse(concept, concept_original):
-            
-            if concept not in nodes:
-                hasse.add_node(concept, shape_fill="#FFFFFF", shape="ellipse", font_size="14")
-                nodes.append(concept)
-                generator = format_generators(triadic_concepts[triadic_concepts.index(
-            concept_original)].feature_generator_minimal)
-                if generator != None:
-                    if generator not in nodes_gen:
-                        nodes_gen.append(generator)
-                        hasse.add_node(generator, shape_fill="#99CCFF", shape="rectangle", font_size="14")
-                    hasse.add_edge(str(generator), str(concept))
-            
-        hasse = pyyed.Graph()
-        for link in tqdm(links):
-            concept, sucessor = link[0], link[1]
-            concept_original = concept.copy()
-            sucessor_original = sucessor.copy()
-            if concept == EMPTY_SET:
-                concept = 'ø'
-            if sucessor == EMPTY_SET:
-                sucessor = 'ø'
-            concept = str(', '.join(x for x in sorted(concept)))
-            sucessor = str(', '.join(x for x in sorted(sucessor)))
-            
-            check_concept_is_in_hasse(concept, concept_original)
-            check_concept_is_in_hasse(sucessor, sucessor_original)
-            hasse.add_edge(str(concept), str(sucessor))
-            
-        hasse.write_graph('output/' + file_name + '_hasse_diagram.graphml', pretty_print=True)
         
     def concept_stability_calculation(concept, triadic_concepts, formal_context):
         
@@ -614,4 +561,163 @@ class TriadicConcept:
             triadic_concepts[triadic_concepts.index(_extent)].concept_stability = scores
             
         return triadic_concepts
+    
+    def separation_index_calculation(triadic_concepts):
+        sum_intent_modus = 0
+        sum_intent_all_modus = 0
+        sum_all_extent = 0
+        size_A1 = 0
+        size_A2 = 0
+        size_A3 = 0
+        list_separation_index = []
+        list_appear_A2_A3 = []
+
+        dic_count_extent = {}
+        dic_count_intent_modus = {}
+        list_appear_extent_intent_modus = []
+        count_intent = 0
+        count_modus = 0
+
+        for concept in triadic_concepts:
+            extent = [x for x in concept.extent]
+            intent, modus = concept.intent, concept.modus
+            if extent != []:
+                for element_extent in extent:
+                    for item in zip(intent, modus):
+                        intent_item, modus_item = item
+                        for element_intent in intent_item:
+                            for element_modus in modus_item:
+                                if element_intent != 'ø' and element_modus != 'ø':
+
+                                    if str(element_extent) not in dic_count_extent:
+                                        dic_count_extent.update(
+                                            {str(element_extent): 1})
+
+                                    elif [[str(element_extent)], [str(element_intent)+" "+str(element_modus)]] not in list_appear_extent_intent_modus:
+                                        count = dic_count_extent[str(
+                                            element_extent)]
+                                        count += 1
+                                        dic_count_extent.update(
+                                            {str(element_extent): count})
+                                    
+                                    if str(element_intent + " " + element_modus) not in dic_count_intent_modus:
+                                        dic_count_intent_modus.update(
+                                            {str(element_intent + " " + element_modus): 1})
+
+                                    elif [[str(element_extent)], [str(element_intent)+" "+str(element_modus)]] not in list_appear_extent_intent_modus:
+                                        count = dic_count_intent_modus[str(
+                                            element_intent + " " + element_modus)]
+                                        count += 1
+                                        dic_count_intent_modus.update(
+                                            {str(element_intent + " " + element_modus): count})
+
+                                    list_appear_extent_intent_modus.append(
+                                        [[str(element_extent)], [str(element_intent)+" "+str(element_modus)]])
+
+        for concept in triadic_concepts:
+            extent = [x for x in concept.extent]
+            intent, modus = concept.intent, concept.modus
+            if extent != []:
+                for element_extent in extent:
+                    size_A1 += 1
+                    sum_all_extent += dic_count_extent[element_extent]
+                for item in zip(intent, modus):
+                    intent_item, modus_item = item
+
+                    if str(extent)+" " + str(intent_item) + " " + str(modus_item) not in list_appear_A2_A3:
+                        size_A2 += len(intent_item)
+                        size_A3 += len(modus_item)
+                        list_appear_A2_A3.append(
+                            str(extent)+" " + str(intent_item) + " " + str(modus_item))
+
+                    for element_intent in intent_item:
+                        for element_modus in modus_item:
+                            if element_intent != 'ø' and element_modus != 'ø':
+
+                                sum_intent_all_modus += dic_count_intent_modus[str(
+                                    element_intent + " " + element_modus)]
+
+                        sum_intent_modus += sum_intent_all_modus
+                        sum_intent_all_modus = 0
+
+                    if element_intent != 'ø' and element_modus != 'ø':
+                        try:
+                            separation_value = (size_A1 * size_A2 * size_A3) / (
+                                (sum_all_extent + sum_intent_modus) - (size_A1 * size_A2 * size_A3))
+                        except ZeroDivisionError:
+                            separation_value = 0
+                        list_separation_index.append(
+                            [(extent), (intent_item), (modus_item), separation_value])
+
+                    separation_value = 0
+                    sum_intent_modus = 0
+                    size_A2 = 0
+                    size_A3 = 0
+
+                sum_all_extent = 0
+                size_A1 = 0
+        
+        for result in list_separation_index:
+            if result != []:
+                extent = frozenset(result[0])
+                intent = list(result[1])
+                modus = list(result[2])
+                separation_index = result[3]
+                triadic_concepts[triadic_concepts.index(extent)].separation_index.append([intent, modus, separation_index])
+    
+        return triadic_concepts
+    
+    def create_hasse_diagram(triadic_concepts, links, file_name):
+        
+        nodes = []
+        nodes_gen = []
+        
+        def format_generators(generators):
+            t_gens = []
+            if generators == []:
+                return None
+            for v in generators:
+                if isinstance(v[0], list):
+                    intent = [', '.join(x for x in sorted(v[0]))]
+                    modus = [', '.join(x for x in sorted(v[1]))]
+                    t_gen = str("(" + ', '.join([x for x in intent])) + " - " + str(', '.join([x for x in modus]))+")"
+                    t_gens.append(t_gen)
+                else:
+                    t_gen = "(" + str(v[0]) + " - " + str(v[1]) + ")"
+                    t_gens.append(t_gen)
+            if len(t_gens) > 1:
+                return ["\n".join(x for x in t_gens)][0]
+            else:
+                return t_gens[0]
+            
+        def check_concept_is_in_hasse(concept, concept_original):
+            
+            if concept not in nodes:
+                hasse.add_node(concept, shape_fill="#FFFFFF", shape="ellipse", font_size="14")
+                nodes.append(concept)
+                generator = format_generators(triadic_concepts[triadic_concepts.index(
+            concept_original)].feature_generator_minimal)
+                if generator != None:
+                    if generator not in nodes_gen:
+                        nodes_gen.append(generator)
+                        hasse.add_node(generator, shape_fill="#99CCFF", shape="rectangle", font_size="14")
+                    hasse.add_edge(str(generator), str(concept))
+            
+        hasse = pyyed.Graph()
+        for link in tqdm(links):
+            concept, sucessor = link[0], link[1]
+            concept_original = concept.copy()
+            sucessor_original = sucessor.copy()
+            if concept == EMPTY_SET:
+                concept = 'ø'
+            if sucessor == EMPTY_SET:
+                sucessor = 'ø'
+            concept = str(', '.join(x for x in sorted(concept)))
+            sucessor = str(', '.join(x for x in sorted(sucessor)))
+            
+            check_concept_is_in_hasse(concept, concept_original)
+            check_concept_is_in_hasse(sucessor, sucessor_original)
+            hasse.add_edge(str(concept), str(sucessor))
+            
+        hasse.write_graph('output/' + file_name + '_hasse_diagram.graphml', pretty_print=True)
 
