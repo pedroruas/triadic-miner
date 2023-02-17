@@ -11,9 +11,11 @@ from itertools import repeat
 from concepts import Definition, Context
 import pyyed
 from itertools import chain, combinations
+import os
 
 EMPTY_SET = set([])
 PROCESSES = 8  # Amount of threads to be used while computing and validating Feature-Generators
+
 
 @dataclass(slots=True, order=True)
 class TriadicConcept:
@@ -28,13 +30,13 @@ class TriadicConcept:
     feature_generator_candidates: list[list] = field(default_factory=list)
     concept_stability: list[list] = field(default_factory=list)
     separation_index: list[list] = field(default_factory=list)
-    
+
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
         return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}\nConcept Stability: {self.concept_stability}\nSeparation Index: {self.separation_index}'
-    
+
     def __eq__(self, other):
         if other == self.extent:
             return True
@@ -102,7 +104,7 @@ class TriadicConcept:
                 list: returns a list with the links between Triadic Concepts
         """
         links = []
-        border_max = 0 # border <- the very first element with the smallest EXTENT cardinality
+        border_max = 0  # border <- the very first element with the smallest EXTENT cardinality
         border = triadic_concepts[0].extent
 
         for concept in tqdm(triadic_concepts[1:]):
@@ -168,7 +170,7 @@ class TriadicConcept:
         return links_dic
 
     def getContext_K1K2(intent, modus):
-        
+
         intent = [list(x) for x in intent]
         modus = [list(x) for x in modus]
 
@@ -326,7 +328,7 @@ class TriadicConcept:
 
         updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
             current_concept_extent)].feature_generator_candidates = t_generator
-        
+
         return updadet_triadic_concept
 
     def compute_f_generators_candidates(triadic_concepts, links, compute_feature_generators_for_infimum):
@@ -364,7 +366,7 @@ class TriadicConcept:
             ext_uniques = list(links_dict.keys())
             if EMPTY_SET in ext_uniques:
                 ext_uniques.remove(EMPTY_SET)
-                
+
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(TriadicConcept.f_generator, zip(ext_uniques, repeat(
                 links_dict), repeat(triadic_concepts))):
@@ -398,17 +400,17 @@ class TriadicConcept:
         return Context(*formal_context)
 
     def validade_feature_generator_candidates(concept_extent, triadic_concepts, formal_context):
-        
+
         final_t_generator = []
         f_gens = triadic_concepts[triadic_concepts.index(
-                set(concept_extent))].feature_generator_candidates
-        
+            set(concept_extent))].feature_generator_candidates
+
         def attributes_in_properties(attributes, formal_context):
-                for attribute in attributes:
-                    if attribute not in formal_context.properties:
-                        return False
-                return True
-        
+            for attribute in attributes:
+                if attribute not in formal_context.properties:
+                    return False
+            return True
+
         def check_if_generator_belongs_to_extent(extent, generator, formal_context):
             if not attributes_in_properties(generator, formal_context):
                 return False
@@ -417,11 +419,11 @@ class TriadicConcept:
                 return False
             else:
                 return True
-            
+
         for generator in f_gens:
             to_check = []
             to_add = []
-            if isinstance(generator[0],str) and isinstance(generator[1],str):
+            if isinstance(generator[0], str) and isinstance(generator[1], str):
                 to_check = [generator[0] + " " + generator[1]]
                 if check_if_generator_belongs_to_extent(concept_extent, to_check, formal_context) and generator not in final_t_generator:
                     final_t_generator.extend([generator])
@@ -431,68 +433,70 @@ class TriadicConcept:
                     for modus in generator[1]:
                         to_check.extend([intent + " " + modus])
                 if check_if_generator_belongs_to_extent(concept_extent, to_check, formal_context) and generator not in final_t_generator:
-                            final_t_generator.extend([generator])
-        
+                    final_t_generator.extend([generator])
+
         updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
             concept_extent)].feature_generator = final_t_generator
-        
+
         return concept_extent, updadet_triadic_concept
-    
+
     def compute_minimality_feature_generators(concept_extent, triadic_concepts):
         f_gens = triadic_concepts[triadic_concepts.index(
-                set(concept_extent))].feature_generator
+            set(concept_extent))].feature_generator
         f_gens_to_check = f_gens[::-1].copy()
         f_gens_final = f_gens.copy()
-        
+
         def cast_to_list(item):
             if isinstance(item, str):
                 return [item]
             return item
-        
+
         while len(f_gens_to_check) != 0:
             generator_to_check = f_gens_to_check.pop()
             for generator in f_gens:
                 if generator != generator_to_check and generator in f_gens_final and generator_to_check in f_gens_final:
                     intent_gen, modus_gen = generator
                     intent_gen_check, modus_gen_check = generator_to_check
-                    
+
                     intent_gen = cast_to_list(intent_gen)
                     modus_gen = cast_to_list(modus_gen)
                     intent_gen_check = cast_to_list(intent_gen_check)
                     modus_gen_check = cast_to_list(modus_gen_check)
-                
+
                     if set(intent_gen_check).issubset(set(intent_gen)) and set(modus_gen_check).issubset(set(modus_gen)):
                         if generator in f_gens_final:
                             f_gens_final.remove(generator)
-        
+
         updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
             concept_extent)].feature_generator_minimal = f_gens_final
-        
+
         return concept_extent, updadet_triadic_concept
-    
+
     def compute_feature_generator_validation(triadic_concepts, formal_context):
-        
+
         ext_uniques = [concept.extent for concept in triadic_concepts]
-        
+
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(TriadicConcept.validade_feature_generator_candidates, zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context))):
-            triadic_concepts[triadic_concepts.index(set(result[0]))].feature_generator = result[1]
+            triadic_concepts[triadic_concepts.index(
+                set(result[0]))].feature_generator = result[1]
         pool.close()
-        
+
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(TriadicConcept.compute_minimality_feature_generators, zip(ext_uniques, repeat(triadic_concepts))):
-            triadic_concepts[triadic_concepts.index(set(result[0]))].feature_generator_minimal = result[1]
+            triadic_concepts[triadic_concepts.index(
+                set(result[0]))].feature_generator_minimal = result[1]
         pool.close()
-        
+
         return triadic_concepts
-        
+
     def concept_stability_calculation(concept, triadic_concepts, formal_context):
-        
+
         def powerset(iterable):
             "list(powerset([1,2,3])) --> [(), (1,), (2,), (3,), (1,2), (1,3), (2,3), (1,2,3)] "
             s = list(iterable)
             return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
-        
+
         context = Definition()
         list_concept_stability = []
         count_concept_stability = 0
@@ -500,12 +504,13 @@ class TriadicConcept:
         intent = triadic_concepts[triadic_concepts.index(concept)].intent
         modus = triadic_concepts[triadic_concepts.index(concept)].modus
         extent = [x for x in extent]
-        
+
         if extent != []:
             for item in zip(intent, modus):
                 intent_item, modus_item = item
                 if len(extent) == 1:
-                    list_concept_stability.append([list(extent), intent_item, modus_item, 0.5])
+                    list_concept_stability.append(
+                        [list(extent), intent_item, modus_item, 0.5])
                 else:
                     powerset_ext = powerset(extent)
                     for ext in powerset_ext:
@@ -515,17 +520,17 @@ class TriadicConcept:
                                 for element in list(intention):
                                     intent_part, modus_part = element.split()
                                     context.add_object(str(intent_part), [
-                                                str(modus_part), ])
+                                        str(modus_part), ])
                             else:
                                 intention = formal_context.intension(ext,)
-                                
+
                                 # When the powerset of some EXTENT is computed, is it possible to create some combination of extents that does not have any shared feature. In this sense, this IF test will just skip these extents that doesn't share any feature.
                                 if list(intention) == []:
                                     continue
                                 for element in list(intention):
                                     intent_part, modus_part = element.split()
                                     context.add_object(str(intent_part), [
-                                                str(modus_part), ])
+                                        str(modus_part), ])
                             _context = Context(*context)
                             lattice = _context.lattice
                             for intent_subset, modus_subset in lattice:
@@ -536,17 +541,18 @@ class TriadicConcept:
                         list_concept_stability.append(
                             [list(extent), intent_item, modus_item, count_concept_stability/2**len(extent)])
                     count_concept_stability = 0
-        
+
         return list_concept_stability
-    
+
     def compute_concept_stability(triadic_concepts, formal_context):
-        
+
         ext_uniques = [concept.extent for concept in triadic_concepts]
-        
+
         pool = ThreadPool(PROCESSES)
-        list_concept_stability_final = pool.starmap(TriadicConcept.concept_stability_calculation, zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context)))
+        list_concept_stability_final = pool.starmap(TriadicConcept.concept_stability_calculation, zip(
+            ext_uniques, repeat(triadic_concepts), repeat(formal_context)))
         pool.close()
-        
+
         for result in list_concept_stability_final:
             _extent = EMPTY_SET
             scores = []
@@ -558,10 +564,11 @@ class TriadicConcept:
                     modus = list(concept[2])
                     concept_stability = concept[3]
                     scores.append([intent, modus, concept_stability])
-            triadic_concepts[triadic_concepts.index(_extent)].concept_stability = scores
-            
+            triadic_concepts[triadic_concepts.index(
+                _extent)].concept_stability = scores
+
         return triadic_concepts
-    
+
     def separation_index_calculation(triadic_concepts):
         sum_intent_modus = 0
         sum_intent_all_modus = 0
@@ -599,7 +606,7 @@ class TriadicConcept:
                                         count += 1
                                         dic_count_extent.update(
                                             {str(element_extent): count})
-                                    
+
                                     if str(element_intent + " " + element_modus) not in dic_count_intent_modus:
                                         dic_count_intent_modus.update(
                                             {str(element_intent + " " + element_modus): 1})
@@ -656,22 +663,23 @@ class TriadicConcept:
 
                 sum_all_extent = 0
                 size_A1 = 0
-        
+
         for result in list_separation_index:
             if result != []:
                 extent = frozenset(result[0])
                 intent = list(result[1])
                 modus = list(result[2])
                 separation_index = result[3]
-                triadic_concepts[triadic_concepts.index(extent)].separation_index.append([intent, modus, separation_index])
-    
+                triadic_concepts[triadic_concepts.index(extent)].separation_index.append([
+                    intent, modus, separation_index])
+
         return triadic_concepts
-    
+
     def create_hasse_diagram(triadic_concepts, links, file_name):
-        
+
         nodes = []
         nodes_gen = []
-        
+
         def format_generators(generators):
             t_gens = []
             if generators == []:
@@ -680,7 +688,8 @@ class TriadicConcept:
                 if isinstance(v[0], list):
                     intent = [', '.join(x for x in sorted(v[0]))]
                     modus = [', '.join(x for x in sorted(v[1]))]
-                    t_gen = str("(" + ', '.join([x for x in intent])) + " - " + str(', '.join([x for x in modus]))+")"
+                    t_gen = str(
+                        "(" + ', '.join([x for x in intent])) + " - " + str(', '.join([x for x in modus]))+")"
                     t_gens.append(t_gen)
                 else:
                     t_gen = "(" + str(v[0]) + " - " + str(v[1]) + ")"
@@ -689,20 +698,22 @@ class TriadicConcept:
                 return ["\n".join(x for x in t_gens)][0]
             else:
                 return t_gens[0]
-            
+
         def check_concept_is_in_hasse(concept, concept_original):
-            
+
             if concept not in nodes:
-                hasse.add_node(concept, shape_fill="#FFFFFF", shape="ellipse", font_size="14")
+                hasse.add_node(concept, shape_fill="#FFFFFF",
+                               shape="ellipse", font_size="14")
                 nodes.append(concept)
                 generator = format_generators(triadic_concepts[triadic_concepts.index(
-            concept_original)].feature_generator_minimal)
+                    concept_original)].feature_generator_minimal)
                 if generator != None:
                     if generator not in nodes_gen:
                         nodes_gen.append(generator)
-                        hasse.add_node(generator, shape_fill="#99CCFF", shape="rectangle", font_size="14")
+                        hasse.add_node(generator, shape_fill="#99CCFF",
+                                       shape="rectangle", font_size="14")
                     hasse.add_edge(str(generator), str(concept))
-            
+
         hasse = pyyed.Graph()
         for link in tqdm(links):
             concept, sucessor = link[0], link[1]
@@ -718,6 +729,8 @@ class TriadicConcept:
             check_concept_is_in_hasse(concept, concept_original)
             check_concept_is_in_hasse(sucessor, sucessor_original)
             hasse.add_edge(str(concept), str(sucessor))
-            
-        hasse.write_graph('output/' + file_name + '_hasse_diagram.graphml', pretty_print=True)
 
+        if not os.path.isdir("output/"):
+            os.mkdir("output")
+        hasse.write_graph('output/' + file_name +
+                          '_hasse_diagram.graphml', pretty_print=True)
