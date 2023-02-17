@@ -217,13 +217,14 @@ class AssociationRule:
                             confidence = len(source_B1) / len(target_A1)
 
                             if set(source_intent_B2)-set(target_intent_A2) != EMPTY_SET:
-                                rule = AssociationRule(antecedent=source_intent_B2,
-                                                       consequent=target_intent_A2,
-                                                       condition=list(U3),
-                                                       support=support,
-                                                       confidence=confidence,
-                                                       current_concept_extent=source_concept,
-                                                       predecessor_concept_extent=target_concept)
+                                rule = AssociationRule(antecedent=list(U2),
+                                                       consequent=list(
+                                    set(set(source_intent_B2)-set(target_intent_A2))),
+                                    condition=list(U3),
+                                    support=support,
+                                    confidence=confidence,
+                                    current_concept_extent=source_concept,
+                                    predecessor_concept_extent=target_concept)
                                 if rule not in rules_BCAAR:
                                     rules_BCAAR.append(rule)
 
@@ -321,13 +322,14 @@ class AssociationRule:
 
                             if set(source_modus_B3)-set(target_modus_A3) != EMPTY_SET:
 
-                                rule = AssociationRule(antecedent=source_intent_B2,
-                                                       consequent=target_intent_A2,
-                                                       condition=list(U3),
-                                                       support=support,
-                                                       confidence=confidence,
-                                                       current_concept_extent=source_concept,
-                                                       predecessor_concept_extent=target_concept)
+                                rule = AssociationRule(antecedent=list(U3),
+                                                       consequent=list(
+                                    set(set(source_modus_B3)-set(target_modus_A3))),
+                                    condition=list(U2),
+                                    support=support,
+                                    confidence=confidence,
+                                    current_concept_extent=source_concept,
+                                    predecessor_concept_extent=target_concept)
                                 if rule not in rules_BACAR:
                                     rules_BACAR.append(rule)
 
