@@ -6,7 +6,7 @@
   "input_files": [ 
     "Data/example_PNKRS_2017_big.data.out"
   ],
-  "output_dir": "miner_output/",
+  "output_dir": "output/",
   "compute_feature_generators_for_infimum": false,
   "compute_concept_stability" : false,
   "compute_separation_index" : false,
