@@ -42,7 +42,7 @@ class AssociationRule:
 
         return f'({antecedent} -> {consequent}) {condition}\t(sup: {self.support}, conf: {self.confidence})\nConcept extent: {current_concept_extent}\nPredecessor concept: {predecessor_concept_extent}'
 
-    def compute_BCAI_implications(triadic_concepts):
+    def compute_BCAI_implications(triadic_concepts, minimum_support_rules):
 
         BCAI_implications = []
         _max_cardinality = max(
@@ -73,19 +73,22 @@ class AssociationRule:
                         if implication != EMPTY_SET:
                             implication = list(implication)
                             support = concept.extent_size / _max_cardinality
-                            rule = AssociationRule(antecedent=intent_generator,
-                                                   consequent=implication,
-                                                   condition=modus_generator,
-                                                   support=support,
-                                                   confidence=1.0,
-                                                   current_concept_extent=extent,
-                                                   predecessor_concept_extent=None)
-                            if rule not in BCAI_implications:
-                                BCAI_implications.append(rule)
+
+                            if support >= minimum_support_rules:
+                                rule = AssociationRule(antecedent=intent_generator,
+                                                       consequent=implication,
+                                                       condition=modus_generator,
+                                                       support=round(
+                                                           support, 3),
+                                                       confidence=1.0,
+                                                       current_concept_extent=extent,
+                                                       predecessor_concept_extent=None)
+                                if rule not in BCAI_implications:
+                                    BCAI_implications.append(rule)
 
         return BCAI_implications
 
-    def compute_BACI_implications(triadic_concepts):
+    def compute_BACI_implications(triadic_concepts, minimum_support_rules):
 
         BACI_implications = []
         _max_cardinality = max(
@@ -116,19 +119,22 @@ class AssociationRule:
                         if implication != EMPTY_SET:
                             implication = list(implication)
                             support = concept.extent_size / _max_cardinality
-                            rule = AssociationRule(antecedent=modus_generator,
-                                                   consequent=implication,
-                                                   condition=intent_generator,
-                                                   support=support,
-                                                   confidence=1.0,
-                                                   current_concept_extent=extent,
-                                                   predecessor_concept_extent=None)
-                            if rule not in BACI_implications:
-                                BACI_implications.append(rule)
+
+                            if support >= minimum_support_rules:
+                                rule = AssociationRule(antecedent=modus_generator,
+                                                       consequent=implication,
+                                                       condition=intent_generator,
+                                                       support=round(
+                                                           support, 3),
+                                                       confidence=1.0,
+                                                       current_concept_extent=extent,
+                                                       predecessor_concept_extent=None)
+                                if rule not in BACI_implications:
+                                    BACI_implications.append(rule)
 
         return BACI_implications
 
-    def compute_BCAAR_association_rules(triadic_concepts, links):
+    def compute_BCAAR_association_rules(triadic_concepts, minimum_support_rules, minimum_confidence_rules, links):
 
         _max_cardinality = max(
             concept.extent_size for concept in triadic_concepts)
@@ -216,21 +222,22 @@ class AssociationRule:
                             support = len(source_B1) / _max_cardinality
                             confidence = len(source_B1) / len(target_A1)
 
-                            if set(source_intent_B2)-set(target_intent_A2) != EMPTY_SET:
-                                rule = AssociationRule(antecedent=list(U2),
-                                                       consequent=list(
-                                    set(set(source_intent_B2)-set(target_intent_A2))),
-                                    condition=list(U3),
-                                    support=support,
-                                    confidence=confidence,
-                                    current_concept_extent=source_concept,
-                                    predecessor_concept_extent=target_concept)
-                                if rule not in rules_BCAAR:
-                                    rules_BCAAR.append(rule)
+                            if support >= minimum_support_rules and confidence >= minimum_confidence_rules:
+                                if set(source_intent_B2)-set(target_intent_A2) != EMPTY_SET:
+                                    rule = AssociationRule(antecedent=list(U2),
+                                                           consequent=list(
+                                        set(set(source_intent_B2)-set(target_intent_A2))),
+                                        condition=list(U3),
+                                        support=round(support, 3),
+                                        confidence=round(confidence, 3),
+                                        current_concept_extent=source_concept,
+                                        predecessor_concept_extent=target_concept)
+                                    if rule not in rules_BCAAR:
+                                        rules_BCAAR.append(rule)
 
         return rules_BCAAR
 
-    def compute_BACAR_association_rules(triadic_concepts, links):
+    def compute_BACAR_association_rules(triadic_concepts, minimum_support_rules, minimum_confidence_rules, links):
 
         _max_cardinality = max(
             concept.extent_size for concept in triadic_concepts)
@@ -320,17 +327,18 @@ class AssociationRule:
                             support = len(source_B1) / _max_cardinality
                             confidence = len(source_B1) / len(target_A1)
 
-                            if set(source_modus_B3)-set(target_modus_A3) != EMPTY_SET:
+                            if support >= minimum_support_rules and confidence >= minimum_confidence_rules:
+                                if set(source_modus_B3)-set(target_modus_A3) != EMPTY_SET:
 
-                                rule = AssociationRule(antecedent=list(U3),
-                                                       consequent=list(
-                                    set(set(source_modus_B3)-set(target_modus_A3))),
-                                    condition=list(U2),
-                                    support=support,
-                                    confidence=confidence,
-                                    current_concept_extent=source_concept,
-                                    predecessor_concept_extent=target_concept)
-                                if rule not in rules_BACAR:
-                                    rules_BACAR.append(rule)
+                                    rule = AssociationRule(antecedent=list(U3),
+                                                           consequent=list(
+                                        set(set(source_modus_B3)-set(target_modus_A3))),
+                                        condition=list(U2),
+                                        support=round(support, 3),
+                                        confidence=round(confidence, 3),
+                                        current_concept_extent=source_concept,
+                                        predecessor_concept_extent=target_concept)
+                                    if rule not in rules_BACAR:
+                                        rules_BACAR.append(rule)
 
         return rules_BACAR
