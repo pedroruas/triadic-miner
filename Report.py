@@ -46,6 +46,31 @@ class Report():
             '{:.4}'.format(total_time), '{:.4}'.format(total_time/60), '{:.4}'.format(total_time/3600)))
         file.close()
 
+    def save_triadic_concepts(self, updated_triadic_concepts, triadic_concepts_file_path):
+
+        file = open(triadic_concepts_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'TRIADIC CONCEPTS', 7)
+
+        for concept in updated_triadic_concepts:
+            extent = concept.extent
+            intent = concept.intent
+            modus = concept.modus
+            if extent == EMPTY_SET:
+                extent = 'ø'
+            extent = str(
+                ', '.join([', '.join(x for x in sorted(extent))]))
+
+            file.write('EXTENT: {0}\n'.format(extent))
+
+            for attribute in zip(intent, modus):
+                _int = str(
+                    ', '.join([', '.join(x for x in sorted(attribute[0]))]))
+                _mod = str(
+                    ', '.join([', '.join(x for x in sorted(attribute[1]))]))
+                file.write('({0} - {1})\n'.format(_int, _mod))
+            file.write('\n')
+        file.close()
+
     def save_links(self, links, links_concepts_file_path):
 
         file = open(links_concepts_file_path, 'w', encoding='utf-8')
@@ -122,12 +147,12 @@ class Report():
             file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
                 left_part, right_part, condition, support, confidence))
         file.close()
-    
+
     def save_BCAAR_rules(self, BCAAR_rules, BCAAR_rules_file_path):
-        
+
         file = open(BCAAR_rules_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'BCAAR ASSOCIATION RULES', 6)
-        
+
         for rule in BCAAR_rules:
             left_part = str(
                 ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
@@ -140,12 +165,12 @@ class Report():
             file.write('({0} -> {1}) {2} \t (support = {3}, confidence = {4})\n'.format(
                 left_part, right_part, condition, support, confidence))
         file.close()
-    
+
     def save_BACAR_rules(self, BACAR_rules, BACAR_rules_file_path):
-        
+
         file = open(BACAR_rules_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'BACAR ASSOCIATION RULES', 6)
-        
+
         for rule in BACAR_rules:
             left_part = str(
                 ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
