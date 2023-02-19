@@ -86,6 +86,15 @@ class TriadicConcept:
         return sorted(unique_triadic_concepts, key=lambda x: x.extent_size, reverse=False)
 
     def create_triadic_concepts_faces(triadic_concepts):
+        """_summary_
+
+        Args:
+            triadic_concepts (list): list of objects of the class TriadicConcept
+
+        Returns:
+            faces (dict): is a dictionary with the initial faces of each unique extents
+            all_extents (set): is a set with all the unique extents
+        """
         faces = {}
         all_extents = set()
         for concept in triadic_concepts:
@@ -541,7 +550,7 @@ class TriadicConcept:
                         list_concept_stability.append(
                             [list(extent), intent_item, modus_item, round(count_concept_stability/2**len(extent), 3)])
                     count_concept_stability = 0
-        
+
         return list_concept_stability
 
     def compute_concept_stability(triadic_concepts, formal_context):
