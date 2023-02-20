@@ -727,6 +727,15 @@ class TriadicConcept:
         return triadic_concepts
 
     def separation_index_calculation(triadic_concepts):
+        """Takes the triadic_concepts and computes the Separation Index for all the Triadic Concepts in the list.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+
+        Returns:
+            triadic_concepts (list): list of TriadicConcept objects updated with Separation Index 
+        """
+
         sum_intent_modus = 0
         sum_intent_all_modus = 0
         sum_all_extent = 0
