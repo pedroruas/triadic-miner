@@ -447,6 +447,14 @@ class TriadicConcept:
         return triadic_concepts
 
     def compute_formal_context(triadic_concepts):
+        """Takes the triadic_concepts and creates a Formal Context that represents all the Triadic Concepts.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+
+        Returns:
+            formal_context (concepts Context): returns the Formal Context representing all the Triadic Concepts
+        """
         formal_context = Definition()
         for concept in tqdm(triadic_concepts):
             extent = [x for x in concept.extent]
