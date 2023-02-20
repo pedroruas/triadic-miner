@@ -693,6 +693,15 @@ class TriadicConcept:
         return list_concept_stability
 
     def compute_concept_stability(triadic_concepts, formal_context):
+        """Takes triadic_concepts and formal_context to call the function 'concept_stability_calculation' that will be executed in parallel.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+
+        Returns:
+            triadic_concepts (list): list of TriadicConcept objects updated with Concept Stability 
+        """
 
         ext_uniques = [concept.extent for concept in triadic_concepts]
 
