@@ -555,6 +555,18 @@ class TriadicConcept:
         return concept_extent, updadet_triadic_concept
 
     def compute_minimality_feature_generators(concept_extent, triadic_concepts):
+        """Takes the concept_extent and triadic_concepts to compute the minimality test on Feature Generators. 
+        Since we are interrested in Minimal Feature generators, this function compares the compatible Generators and removes non Minimal Generators from the list associated with a Triadic Concept.
+
+        Args:
+            concept_extent (set): the extent of a TriadicConcept
+            triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
+
+        Returns:
+            concept_extent (set): the extent of a TriadicConcept object
+            updadet_triadic_concept (list): list of TriadicConcept objects
+        """
+
         f_gens = triadic_concepts[triadic_concepts.index(
             set(concept_extent))].feature_generator
         f_gens_to_check = f_gens[::-1].copy()
