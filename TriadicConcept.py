@@ -14,7 +14,7 @@ from itertools import chain, combinations
 import os
 
 EMPTY_SET = set([])
-PROCESSES = 8  # Amount of threads to be used while computing and validating Feature-Generators
+PROCESSES = 8  # Amount of threads to be used in multithreading
 
 
 @dataclass(slots=True, order=True)
@@ -36,7 +36,13 @@ class TriadicConcept:
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f'Extent: {self.extent}\nIntent: {self.intent}\nModus: {self.modus}\nExtent size: {self.extent_size}\nFeature Generators Candidates: {self.feature_generator_candidates}\nFeature Generators: {self.feature_generator}\nFeature Generators Minimal: {self.feature_generator_minimal}\nConcept Stability: {self.concept_stability}\nSeparation Index: {self.separation_index}'
+        return f"Extent: {self.extent}\nIntent: {self.intent}\
+                \nModus: {self.modus}\nExtent size: {self.extent_size}\
+                \nFeature Generators Candidates:{self.feature_generator_candidates}\
+                \nFeature Generators: {self.feature_generator}\
+                \nFeature Generators Minimal: {self.feature_generator_minimal}\
+                \nConcept Stability: {self.concept_stability}\
+                \nSeparation Index: {self.separation_index}\n"
 
     def __eq__(self, other):
         if other == self.extent:
@@ -44,7 +50,7 @@ class TriadicConcept:
         return False
 
     def get_triadic_concepts_from_input_file(file_path):
-        """Function that reads the triadic concepts computed by Data Peeler 
+        """Function that reads the triadic concepts computed by Data Peeler
         and transforms them in objects of the class TriadicConcept
 
         Args:
@@ -85,16 +91,21 @@ class TriadicConcept:
                     list_modus.append(concept.modus)
             unique_triadic_concepts.append(TriadicConcept(
                 unique_extent, list_intent, list_modus, len(unique_extent)))
-        return sorted(unique_triadic_concepts, key=lambda x: x.extent_size, reverse=False)
+        return sorted(unique_triadic_concepts,
+                      key=lambda x: x.extent_size,
+                      reverse=False)
 
     def create_triadic_concepts_faces(triadic_concepts):
-        """Takes the list of TriadicConcepts and returns the initialized Faces and the the set of all unique extents
+        """Takes the list of TriadicConcepts and returns the initialized Faces
+        and the the set of all unique extents
 
         Args:
-            triadic_concepts (list): list of objects of the class TriadicConcept
+            triadic_concepts (list): list of objects of the class
+            TriadicConcept
 
         Returns:
-            faces (dict): is a dictionary with the initial faces of each unique extents
+            faces (dict): is a dictionary with the initial faces of each
+            unique extents
             all_extents (set): is a set with all the unique extents
         """
 
@@ -107,20 +118,24 @@ class TriadicConcept:
         return faces, all_extents
 
     def T_iPred(triadic_concepts, faces, all_extents):
-        """Takes the list of triadic concepts, the initial Faces and the unique extents of triadic concepts 
-        and calculates the links between triadic concepts.
+        """Takes the list of triadic concepts, the initial Faces and the
+        unique extents of triadic concepts and calculates the links between
+        triadic concepts.
 
         Args:
                 triadic_concepts (list): list of TriadicConcept objects
                 faces (dict): initial data structure to calculate the Faces
-                all_extents (set): a set with all unique extents in triadic_concepts
+                all_extents (set): a set with all unique extents in
+                triadic_concepts
 
         Returns:
-                links (list): returns a list with the links between Triadic Concepts
+                links (list): returns a list with the links between
+                Triadic Concepts
         """
 
         links = []
-        border_max = 0  # border <- the very first element with the smallest EXTENT cardinality
+        border_max = 0
+        # border <- the very first element with the smallest EXTENT cardinality
         border = triadic_concepts[0].extent
 
         for concept in tqdm(triadic_concepts[1:]):
@@ -171,13 +186,15 @@ class TriadicConcept:
         return links
 
     def list_of_links_to_dict(links):
-        """Takes the links between all the concepts and returns a dict with all the successors associated with each Triadic Concept extent.
+        """Takes the links between all the concepts and returns a dict with
+        all the successors associated with each Triadic Concept extent.
 
         Args:
             links (list): list with the links between Triadic Concepts
 
         Returns:
-            links_dic (dict): returns a dict where an extent is the key, and the values are the successors' extent
+            links_dic (dict): returns a dict where an extent is the key,
+            and the values are the successors' extent
         """
 
         links_dic = {}
@@ -195,14 +212,16 @@ class TriadicConcept:
         return links_dic
 
     def getContext_K1K2(intent, modus):
-        """Takes the intent and the modus associated with a Triadic Concept and creates a formal context using a pandas Dataframe to represent it. 
+        """Takes the intent and the modus associated with a Triadic Concept
+        and creates a formal context using a pandas Dataframe to represent it.
 
         Args:
             intent (list): list of intents associated with a Triadic Concept
             modus (list): list of modus associated with a Triadic Concept
 
         Returns:
-            context (pandas Dataframe): returns a Dataframe annotated with the incidences (boolean)
+            context (pandas Dataframe): returns a Dataframe annotated
+            with the incidences (boolean)
         """
 
         intent = [list(x) for x in intent]
@@ -224,24 +243,33 @@ class TriadicConcept:
         return context
 
     def f_generator(concept, links_dict, triadic_concepts):
-        """Takes the concept, links_dict and triadic_concepts to compute the Feature Generators Candidates for all Triadic Concepts extent in the list triadic_concepts.
-        This function is executed using a MapReduce approach based on multithreading.
+        """Takes the concept, links_dict and triadic_concepts to compute the
+        Feature Generators Candidates for all Triadic Concepts extent in the
+        list triadic_concepts.
+        This function is executed using a MapReduce approach
+        based on multithreading.
 
         Args:
             concept (TriadicConcept): an object of the class TriadicConcept
-            links_dict (dict): a dict where an extent is the key, and the values are the successors' extent
+            links_dict (dict): a dict where an extent is the key, and the
+            values are the successors' extent
             triadic_concepts (list): list of all Triadic Concepts
         """
 
         def compute_face_kth_successor(target_intent, target_modus):
-            """Takes the intent and modus part of a Triadic Concept that is a successor, and removes the shared features (by removing incidences from the context) from the current concept.
+            """Takes the intent and modus part of a Triadic Concept that is a
+            successor, and removes the shared features (by removing incidences
+            from the context) from the current concept.
 
             Args:
-                target_intent (list): list of intents associated with a Triadic Concept
-                target_modus (list): list of modus associated with a Triadic Concept
+                target_intent (list): list of intents associated with a
+                Triadic Concept
+                target_modus (list): list of modus associated with a
+                Triadic Concept
 
             Returns:
-                context (pandas Dataframe): returns the context after removing the features from its successor
+                context (pandas Dataframe): returns the context after removing
+                the features from its successor
             """
 
             for intent_item, modus_item in zip(target_intent, target_modus):
@@ -383,29 +411,42 @@ class TriadicConcept:
 
         return updadet_triadic_concept
 
-    def compute_f_generators_candidates(triadic_concepts, links, compute_feature_generators_for_infimum):
-        """Takes triadic_concepts, links and the parameter from the user compute_feature_generators_for_infimum to call the function 'f_generators' to compute in parallel the Feature Generator Candidates.
+    def compute_f_generators_candidates(triadic_concepts,
+                                        links,
+                                        compute_feature_generators_for_infimum):
+        """Takes triadic_concepts, links and the parameter from the user
+        compute_feature_generators_for_infimum to call the function
+        'f_generators' to compute in parallel the Feature Generator Candidates.
 
-        NOTE: the parameter 'compute_feature_generators_for_infimum' may have a great impact on the execution time, since the infimum usually has a empty set in its extent.
+        NOTE: the parameter 'compute_feature_generators_for_infimum' may have
+        a great impact on the execution time, since the infimum usually has
+        a empty set in its extent.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
             links (list): list with the links between Triadic Concepts
-            compute_feature_generators_for_infimum (boolean): parameter that the user can set in the input file (configs.json)
+            compute_feature_generators_for_infimum (boolean): parameter that
+            the user can set in the input file (configs.json)
 
         Returns:
-            triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
+            triadic_concepts (list): updated list of TriadicConcept objects
+            annotaded with the Feature Generator Candidates
         """
 
         def compute_f_generators_supremum(triadic_concepts):
-            """Takes the triadic_concepts, finds the supremum by ordering the concepts by the cardinality of the extents, and computes the Feature Generator Candidates for the supremum. 
-            The supremum has this special behavior because it does not have successors, so its Features Generator Candidates are created separately.
+            """Takes the triadic_concepts, finds the supremum by ordering the
+            concepts by the cardinality of the extents, and computes the
+            Feature Generator Candidates for the supremum.
+            The supremum has this special behavior because it does not have
+            successors, so its Features Generator Candidates
+            are created separately.
 
             Args:
                 triadic_concepts (list): list of TriadicConcept objects
 
             Returns:
-                triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
+                triadic_concepts (list): updated list of TriadicConcept
+                objects annotaded with the Feature Generator Candidates
             """
 
             triadic_concepts = sorted(
@@ -455,13 +496,15 @@ class TriadicConcept:
         return triadic_concepts
 
     def compute_formal_context(triadic_concepts):
-        """Takes the triadic_concepts and creates a Formal Context that represents all the Triadic Concepts.
+        """Takes the triadic_concepts and creates a Formal Context that
+        represents all the Triadic Concepts.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
 
         Returns:
-            formal_context (concepts Context): returns the Formal Context representing all the Triadic Concepts
+            formal_context (concepts Context): returns the Formal Context
+            representing all the Triadic Concepts
         """
 
         formal_context = Definition()
@@ -482,14 +525,21 @@ class TriadicConcept:
 
         return Context(*formal_context)
 
-    def validade_feature_generator_candidates(concept_extent, triadic_concepts, formal_context):
-        """Takes the concept_extent, triadic_concepts and formal_context in order to validate if a Feature Generator Candidate is in fact associated with an extent. This is done by derivating a Feature Generator and checking if the result is the same as the extent in 'concept_extent'.
+    def validade_feature_generator_candidates(concept_extent,
+                                              triadic_concepts,
+                                              formal_context):
+        """Takes the concept_extent, triadic_concepts and formal_context in
+        order to validate if a Feature Generator Candidate is in fact
+        associated with an extent. This is done by derivating a
+        Feature Generator and checking if the result is the same as 
+        the extent in 'concept_extent'.
         This function is executed in parallel using a multithreading approach.
 
         Args:
             concept_extent (set): extent of a TriadicConcept object
             triadic_concepts (list): list of TriadicConcept objects
-            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+            formal_context (concepts Context): the Formal Context representing
+            all the Triadic Concepts
 
         Returns:
             concept_extent (set): the extent of a TriadicConcept object
@@ -501,14 +551,19 @@ class TriadicConcept:
             set(concept_extent))].feature_generator_candidates
 
         def attributes_in_properties(attributes, formal_context):
-            """Takes the attributes (intent x modus) and the formal_context in order to check if the attribute is in fact in the formal_context.
+            """Takes the attributes (intent x modus) and the formal_context
+            in order to check if the attribute is in fact
+            in the formal_context.
 
             Args:
-                attributes (str): string representing the attribute (intent x modus)
-                formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+                attributes (str): string representing the
+                attribute (intent x modus)
+                formal_context (concepts Context): the Formal Context
+                representing all the Triadic Concepts
 
             Returns:
-                bool: if the attribute exists in the formal_context, returns True
+                bool: if the attribute exists in the formal_context,
+                    returns True
             """
 
             for attribute in attributes:
@@ -516,15 +571,21 @@ class TriadicConcept:
                     return False
             return True
 
-        def check_if_generator_belongs_to_extent(extent, generator, formal_context):
-            """Takes the extent, generator, formal_context and check a Feature Generator is associated with an extent.
+        def check_if_generator_belongs_to_extent(extent,
+                                                 generator,
+                                                 formal_context):
+            """Takes the extent, generator, formal_context and check a
+            Feature Generator is associated with an extent.
             Args:
                 extent (set): the extent of a TriadicConcept
-                generator (list): the pair of intent and modus of a Feature Generator
-                formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+                generator (list): the pair of intent and modus of a
+                Feature Generator
+                formal_context (concepts Context): the Formal Context
+                representing all the Triadic Concepts
 
             Returns:
-                bool: returns True if the result of derivation operation gives the same extent as the extent passed as parameter
+                bool: returns True if the result of derivation operation gives
+                the same extent as the extent passed as parameter
             """
 
             if not attributes_in_properties(generator, formal_context):
@@ -555,17 +616,23 @@ class TriadicConcept:
 
         return concept_extent, updadet_triadic_concept
 
-    def compute_minimality_feature_generators(concept_extent, triadic_concepts):
-        """Takes the concept_extent and triadic_concepts to compute the minimality test on Feature Generators. 
-        Since we are interrested in Minimal Feature generators, this function compares the compatible Generators and removes non Minimal Generators from the list associated with a Triadic Concept.
+    def compute_minimality_feature_generators(concept_extent,
+                                              triadic_concepts):
+        """Takes the concept_extent and triadic_concepts to compute
+        the minimality test on Feature Generators.
+        Since we are interrested in Minimal Feature generators,
+        this function compares the compatible Generators and removes
+        non Minimal Generators from the list associated with a Triadic Concept.
 
         Args:
             concept_extent (set): the extent of a TriadicConcept
-            triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
+            triadic_concepts (list): updated list of TriadicConcept objects
+            annotaded with the Feature Generator Candidates
 
         Returns:
             concept_extent (set): the extent of a TriadicConcept object
-            updadet_triadic_concept (list): updated list of TriadicConcept objects
+            updadet_triadic_concept (list): updated list of
+            TriadicConcept objects
         """
 
         f_gens = triadic_concepts[triadic_concepts.index(
@@ -600,44 +667,61 @@ class TriadicConcept:
         return concept_extent, updadet_triadic_concept
 
     def compute_feature_generator_validation(triadic_concepts, formal_context):
-        """Takes the triadic_concepts and formal_context to call the function the will validate the Feature Generator Candidates using a multithreading approach. 
+        """Takes the triadic_concepts and formal_context to call the function
+        the will validate the Feature Generator Candidates using a
+        multithreading approach.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
-            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+            formal_context (concepts Context): the Formal Context representing
+            all the Triadic Concepts
 
         Returns:
-            triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Minimal Feature Generators
+            triadic_concepts (list): updated list of TriadicConcept objects
+            annotaded with the Minimal Feature Generators
         """
 
         ext_uniques = [concept.extent for concept in triadic_concepts]
 
         pool = ThreadPool(PROCESSES)
-        for result in pool.starmap(TriadicConcept.validade_feature_generator_candidates, zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context))):
+        for result in pool.starmap(
+            TriadicConcept.validade_feature_generator_candidates,
+            zip(ext_uniques, repeat(triadic_concepts),
+                repeat(formal_context))):
             triadic_concepts[triadic_concepts.index(
                 set(result[0]))].feature_generator = result[1]
         pool.close()
 
         pool = ThreadPool(PROCESSES)
-        for result in pool.starmap(TriadicConcept.compute_minimality_feature_generators, zip(ext_uniques, repeat(triadic_concepts))):
+        for result in pool.starmap(
+                TriadicConcept.compute_minimality_feature_generators,
+                zip(ext_uniques, repeat(triadic_concepts))):
             triadic_concepts[triadic_concepts.index(
                 set(result[0]))].feature_generator_minimal = result[1]
         pool.close()
 
         return triadic_concepts
 
-    def concept_stability_calculation(concept, triadic_concepts, formal_context):
-        """Takes the concept, triadic_concepts and formal_context and computes the Concept Stability for each Triadic Concept. This is done by computing the powerset(extent). This function is executed in parallel using a multithreading approach.
+    def concept_stability_calculation(concept, triadic_concepts,
+                                      formal_context):
+        """Takes the concept, triadic_concepts and formal_context and computes
+        the Concept Stability for each Triadic Concept. This is done by
+        computing the powerset(extent). This function is executed in parallel
+        using a multithreading approach.
 
-        NOTE: since the powerset of the elements in the extent of all Triadic Concepts is computed, it has a great impact on the execution time when the input file gets bigger (large number of Triadic Concepts).
+        NOTE: since the powerset of the elements in the extent of all Triadic
+        Concepts is computed, it has a great impact on the execution time when
+        the input file gets bigger (large number of Triadic Concepts).
 
         Args:
             concept (TriadicConcept): an object of the class TriadicConcept
             triadic_concepts (list): list of TriadicConcept objects
-            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+            formal_context (concepts Context): the Formal Context representing
+            all the Triadic Concepts
 
         Returns:
-            list_concept_stability (list): returns the Concept Stability for each Triadic Concept object
+            list_concept_stability (list): returns the Concept Stability for
+            each Triadic Concept object
         """
 
         def powerset(iterable):
@@ -672,7 +756,12 @@ class TriadicConcept:
                             else:
                                 intention = formal_context.intension(ext,)
 
-                                # When the powerset of some EXTENT is computed, is it possible to create some combination of extents that does not have any shared feature. In this sense, this IF test will just skip these extents that doesn't share any feature.
+                                # When the powerset of some EXTENT is computed,
+                                # is it possible to create some combination of
+                                # extents that does not have any shared
+                                # feature.
+                                # In this sense, this IF test will just skip
+                                # these extents that doesn't share any feature.
                                 if list(intention) == []:
                                     continue
                                 for element in list(intention):
@@ -687,27 +776,32 @@ class TriadicConcept:
                             context = Definition()
                     if list(ext) != []:
                         list_concept_stability.append(
-                            [list(extent), intent_item, modus_item, round(count_concept_stability/2**len(extent), 3)])
+                            [list(extent), intent_item, modus_item,
+                             round(count_concept_stability/2**len(extent), 3)])
                     count_concept_stability = 0
 
         return list_concept_stability
 
     def compute_concept_stability(triadic_concepts, formal_context):
-        """Takes triadic_concepts and formal_context to call the function 'concept_stability_calculation' that will be executed in parallel.
+        """Takes triadic_concepts and formal_context to call the function
+        'concept_stability_calculation' that will be executed in parallel.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
-            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+            formal_context (concepts Context): the Formal Context representing
+            all the Triadic Concepts
 
         Returns:
-            triadic_concepts (list): list of TriadicConcept objects updated with Concept Stability 
+            triadic_concepts (list): list of TriadicConcept objects updated
+            with Concept Stability 
         """
 
         ext_uniques = [concept.extent for concept in triadic_concepts]
 
         pool = ThreadPool(PROCESSES)
-        list_concept_stability_final = pool.starmap(TriadicConcept.concept_stability_calculation, zip(
-            ext_uniques, repeat(triadic_concepts), repeat(formal_context)))
+        list_concept_stability_final = pool.starmap(
+            TriadicConcept.concept_stability_calculation,
+            zip(ext_uniques, repeat(triadic_concepts), repeat(formal_context)))
         pool.close()
 
         for result in list_concept_stability_final:
@@ -727,13 +821,15 @@ class TriadicConcept:
         return triadic_concepts
 
     def separation_index_calculation(triadic_concepts):
-        """Takes the triadic_concepts and computes the Separation Index for all the Triadic Concepts in the list.
+        """Takes the triadic_concepts and computes the Separation Index for
+        all the Triadic Concepts in the list.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
 
         Returns:
-            triadic_concepts (list): list of TriadicConcept objects updated with Separation Index 
+            triadic_concepts (list): list of TriadicConcept objects
+            updated with Separation Index 
         """
 
         sum_intent_modus = 0
@@ -842,14 +938,19 @@ class TriadicConcept:
         return triadic_concepts
 
     def create_hasse_diagram(triadic_concepts, links, file_name):
-        """Takes the triadic_concepts, links and file_name to create the Hasse Diagram with all the links between the Triadic Concepts and annotaded with the Feature Generators. The Hasse Diagram is a .graphml file that can be displayed on external softwares (as yEd) and it is saved in the output folder that the user specified in the configs.json file.
+        """Takes the triadic_concepts, links and file_name to create the
+        Hasse Diagram with all the links between the Triadic Concepts and
+        annotaded with the Feature Generators.
+        The Hasse Diagram is a .graphml file that can be displayed on
+        external softwares (as yEd) and it is saved in the output folder
+        that the user specified in the configs.json file.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
             links (list): list with the links between Triadic Concepts
             file_name (str): input file name
         """
-        
+
         nodes = []
         nodes_gen = []
 

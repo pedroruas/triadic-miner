@@ -36,21 +36,28 @@ class AssociationRule:
         current_concept_extent = str(
             ', '.join([', '.join(x for x in sorted(self.current_concept_extent))]))
         predecessor_concept_extent = self.predecessor_concept_extent
-        if predecessor_concept_extent != None:
+        if predecessor_concept_extent is not None:
             predecessor_concept_extent = str(
                 ', '.join([', '.join(x for x in sorted(self.predecessor_concept_extent))]))
 
-        return f'({antecedent} -> {consequent}) {condition}\t(sup: {self.support}, conf: {self.confidence})\nConcept extent: {current_concept_extent}\nPredecessor concept: {predecessor_concept_extent}'
+        return f"({antecedent} -> {consequent}) {condition}\
+                \t(sup: {self.support}, conf: {self.confidence})\
+                \nConcept extent: {current_concept_extent}\
+                \nPredecessor concept: {predecessor_concept_extent}\n"
 
     def compute_BCAI_implications(triadic_concepts, minimum_support_rules):
-        """Takes the triadic_concepts and the minimum_support_rules value to compute the BCAI Implications that meets the minimum support value set up by the user.
+        """Takes the triadic_concepts and the minimum_support_rules value to
+        compute the BCAI Implications that meets the minimum support value
+        set up by the user.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
-            minimum_support_rules (float): minimum value set up by the user in the configs.json 
+            minimum_support_rules (float): minimum value set up by the user
+            in the configs.json 
 
         Returns:
-            BCAI_implications (list): list of AssociationRule objects representing the BCAI implications
+            BCAI_implications (list): list of AssociationRule objects
+            representing the BCAI implications
         """
 
         BCAI_implications = []
@@ -74,7 +81,8 @@ class AssociationRule:
 
                 concept_intent_modus = zip(intent, modus)
                 concept_intent_modus = sorted(
-                    concept_intent_modus, key=lambda x: (len(x[0])), reverse=True)
+                    concept_intent_modus, key=lambda x: (len(x[0])),
+                    reverse=True)
                 for item in concept_intent_modus:
                     _intent, _modus = item
                     if set(intent_generator).issubset(set(_intent)) and set(modus_generator).issubset(set(_modus)):
@@ -98,14 +106,18 @@ class AssociationRule:
         return BCAI_implications
 
     def compute_BACI_implications(triadic_concepts, minimum_support_rules):
-        """Takes the triadic_concepts and the minimum_support_rules value to compute the BACI Implications that meets the minimum support value set up by the user.
+        """Takes the triadic_concepts and the minimum_support_rules value to
+        compute the BACI Implications that meets the minimum support value 
+        set up by the user.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
-            minimum_support_rules (float): minimum value set up by the user in the configs.json
+            minimum_support_rules (float): minimum value set up by the user in
+            the configs.json
 
         Returns:
-            BACI_implications (list): list of AssociationRule objects representing the BACI implications
+            BACI_implications (list): list of AssociationRule objects
+            representing the BACI implications
         """
 
         BACI_implications = []
@@ -152,17 +164,26 @@ class AssociationRule:
 
         return BACI_implications
 
-    def compute_BCAAR_association_rules(triadic_concepts, minimum_support_rules, minimum_confidence_rules, links):
-        """Takes the triadic_concepts, minimum_support_rules, minimum_confidence_rules and the links to compute the BCAAR Assoction Rules that meets the minimum support value and the minimum confidence value set up by the user.
+    def compute_BCAAR_association_rules(triadic_concepts,
+                                        minimum_support_rules,
+                                        minimum_confidence_rules,
+                                        links):
+        """Takes the triadic_concepts, minimum_support_rules,
+        minimum_confidence_rules and the links to compute the
+        BCAAR Assoction Rules that meets the minimum support value and
+        the minimum confidence value set up by the user.
 
         Args:
             triadic_concepts (list): list of TriadicConcept objects
-            minimum_support_rules (float): minimum value set up by the user in the configs.json
-            minimum_confidence_rules (float): minimum value set up by the user in the configs.json
+            minimum_support_rules (float): minimum value set up by the user
+            in the configs.json
+            minimum_confidence_rules (float): minimum value set up by the user
+            in the configs.json
             links (list): list with the links between Triadic Concepts
 
         Returns:
-            rules_BCAAR (list): list of AssociationRule objects representing the BCAAR association rules
+            rules_BCAAR (list): list of AssociationRule objects representing
+            the BCAAR association rules
         """
 
         _max_cardinality = max(
@@ -246,7 +267,10 @@ class AssociationRule:
                         source_intent_B2 = cast_to_list(source_intent_B2)
                         source_modus_B3 = cast_to_list(source_modus_B3)
 
-                        if ((set(target_intent_A2).issubset(set(source_intent_B2)) and set(source_modus_B3).issubset(set(target_modus_A3))) and (set(U2).issubset(set(source_intent_B2)) and set(U3).issubset(set(source_modus_B3)))):
+                        if ((set(target_intent_A2).issubset(set(source_intent_B2))
+                             and set(source_modus_B3).issubset(set(target_modus_A3)))
+                            and (set(U2).issubset(set(source_intent_B2))
+                                 and set(U3).issubset(set(source_modus_B3)))):
 
                             support = len(source_B1) / _max_cardinality
                             confidence = len(source_B1) / len(target_A1)
@@ -266,17 +290,26 @@ class AssociationRule:
 
         return rules_BCAAR
 
-    def compute_BACAR_association_rules(triadic_concepts, minimum_support_rules, minimum_confidence_rules, links):
-        """Takes the triadic_concepts, minimum_support_rules, minimum_confidence_rules and the links to compute the BACAR Assoction Rules that meets the minimum support value and the minimum confidence value set up by the user.
-        
+    def compute_BACAR_association_rules(triadic_concepts,
+                                        minimum_support_rules,
+                                        minimum_confidence_rules,
+                                        links):
+        """Takes the triadic_concepts, minimum_support_rules,
+        minimum_confidence_rules and the links to compute the
+        BACAR Assoction Rules that meets the minimum support value
+        and the minimum confidence value set up by the user.
+
         Args:
             triadic_concepts (list): list of TriadicConcept objects
-            minimum_support_rules (float): minimum value set up by the user in the configs.json
-            minimum_confidence_rules (float): minimum value set up by the user in the configs.json
+            minimum_support_rules (float): minimum value set up by the user
+            in the configs.json
+            minimum_confidence_rules (float): minimum value set up by the user
+            in the configs.json
             links (list): list with the links between Triadic Concepts
-        
+
         Returns:
-            rules_BACAR (list): list of AssociationRule objects representing the BACAR association rules
+            rules_BACAR (list): list of AssociationRule objects representing
+            the BACAR association rules
         """
 
         _max_cardinality = max(
@@ -362,7 +395,10 @@ class AssociationRule:
                         source_intent_B2 = cast_to_list(source_intent_B2)
                         source_modus_B3 = cast_to_list(source_modus_B3)
 
-                        if ((set(target_modus_A3).issubset(set(source_modus_B3)) and set(source_intent_B2).issubset(set(target_intent_A2))) and (set(U3).issubset(set(source_modus_B3)) and set(U2).issubset(set(source_intent_B2)))):
+                        if ((set(target_modus_A3).issubset(set(source_modus_B3))
+                             and set(source_intent_B2).issubset(set(target_intent_A2)))
+                            and (set(U3).issubset(set(source_modus_B3))
+                                 and set(U2).issubset(set(source_intent_B2)))):
 
                             support = len(source_B1) / _max_cardinality
                             confidence = len(source_B1) / len(target_A1)

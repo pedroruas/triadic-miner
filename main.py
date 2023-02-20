@@ -12,7 +12,24 @@ from AssociationRules import AssociationRule
 from Report import Report
 
 
-def triadic_miner(file_path, file_name, minimum_support_rules, minimum_confidence_rules, compute_feature_generators_for_infimum, compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path, triadic_concepts_file_path, links_concepts_file_path, feature_generators_file_path, BCAI_implications_file_path, BACI_implications_file_path, BCAAR_rules_file_path, BACAR_rules_file_path, concept_stability_file_path, separation_index_file_path):
+def triadic_miner(file_path,
+                  file_name,
+                  minimum_support_rules,
+                  minimum_confidence_rules,
+                  compute_feature_generators_for_infimum,
+                  compute_concept_stability,
+                  compute_separation_index,
+                  save_hasse_diagram,
+                  report_file_path,
+                  triadic_concepts_file_path,
+                  links_concepts_file_path,
+                  feature_generators_file_path,
+                  BCAI_implications_file_path,
+                  BACI_implications_file_path,
+                  BCAAR_rules_file_path,
+                  BACAR_rules_file_path,
+                  concept_stability_file_path,
+                  separation_index_file_path):
 
     report = Report(report_file_path, file_name)
     report.check_output_folder()
@@ -59,7 +76,7 @@ def triadic_miner(file_path, file_name, minimum_support_rules, minimum_confidenc
         updated_triadic_concepts, minimum_support_rules)
     time = Timer.stop()
     report.add_module_time('Computing BCAI Implications', time)
-    
+
     Timer.start("Computing BACI Implications")
     BACI_implications = AssociationRule.compute_BACI_implications(
         updated_triadic_concepts, minimum_support_rules)
@@ -68,13 +85,15 @@ def triadic_miner(file_path, file_name, minimum_support_rules, minimum_confidenc
 
     Timer.start("Computing BCAAR Association Rules")
     BCAAR_rules = AssociationRule.compute_BCAAR_association_rules(
-        updated_triadic_concepts, minimum_support_rules, minimum_confidence_rules, links)
+        updated_triadic_concepts, minimum_support_rules,
+        minimum_confidence_rules, links)
     time = Timer.stop()
     report.add_module_time('Computing BCAAR Association Rules', time)
 
     Timer.start("Computing BACAR Association Rules")
     BACAR_rules = AssociationRule.compute_BACAR_association_rules(
-        updated_triadic_concepts, minimum_support_rules, minimum_confidence_rules, links)
+        updated_triadic_concepts, minimum_support_rules,
+        minimum_confidence_rules, links)
     time = Timer.stop()
     report.add_module_time('Computing BACAR Association Rules', time)
 
@@ -157,7 +176,23 @@ def main():
         separation_index_file_path = '{0}{1}.separation_index'.format(
             output_dir, file_name)
 
-        triadic_miner(input_file_path, file_name, minimum_support_rules, minimum_confidence_rules,  compute_feature_generators_for_infimum, compute_concept_stability, compute_separation_index, save_hasse_diagram, report_file_path, triadic_concepts_file_path, links_concepts_file_path, feature_generators_file_path, BCAI_implications_file_path, BACI_implications_file_path, BCAAR_rules_file_path, BACAR_rules_file_path, concept_stability_file_path, separation_index_file_path)
+        triadic_miner(input_file_path,
+                      file_name,
+                      minimum_support_rules,
+                      minimum_confidence_rules,
+                      compute_feature_generators_for_infimum,
+                      compute_concept_stability,
+                      compute_separation_index,
+                      save_hasse_diagram, report_file_path,
+                      triadic_concepts_file_path,
+                      links_concepts_file_path,
+                      feature_generators_file_path,
+                      BCAI_implications_file_path,
+                      BACI_implications_file_path,
+                      BCAAR_rules_file_path,
+                      BACAR_rules_file_path,
+                      concept_stability_file_path,
+                      separation_index_file_path)
 
 
 if __name__ == "__main__":
