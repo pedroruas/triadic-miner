@@ -86,11 +86,11 @@ class TriadicConcept:
         return sorted(unique_triadic_concepts, key=lambda x: x.extent_size, reverse=False)
 
     def create_triadic_concepts_faces(triadic_concepts):
-        """_summary_
-
+        """Takes the list of TriadicConcepts and returns the initialized Faces and the the set of all unique extents
+        
         Args:
             triadic_concepts (list): list of objects of the class TriadicConcept
-
+        
         Returns:
             faces (dict): is a dictionary with the initial faces of each unique extents
             all_extents (set): is a set with all the unique extents
