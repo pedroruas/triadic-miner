@@ -113,7 +113,7 @@ class TriadicConcept:
                 all_extents (set): a set with all unique extents in triadic_concepts
 
         Returns:
-                list: returns a list with the links between Triadic Concepts
+                links (list): returns a list with the links between Triadic Concepts
         """
         links = []
         border_max = 0  # border <- the very first element with the smallest EXTENT cardinality
@@ -173,7 +173,7 @@ class TriadicConcept:
             links (list): list with the links between Triadic Concepts
 
         Returns:
-            dict: returns a dict where an extent is the key, and the values are the successors' extent
+            links_dic (dict): returns a dict where an extent is the key, and the values are the successors' extent
         """
         links_dic = {}
         for item in links:
@@ -236,7 +236,7 @@ class TriadicConcept:
                 target_modus (list): list of modus associated with a Triadic Concept
 
             Returns:
-                pandas Dataframe: returns the context after removing the features from its successor
+                context (pandas Dataframe): returns the context after removing the features from its successor
             """
             for intent_item, modus_item in zip(target_intent, target_modus):
                 for x in intent_item:
@@ -378,8 +378,28 @@ class TriadicConcept:
         return updadet_triadic_concept
 
     def compute_f_generators_candidates(triadic_concepts, links, compute_feature_generators_for_infimum):
+        """Takes triadic_concepts, links and the parameter from the user compute_feature_generators_for_infimum to call the function 'f_generators' to compute in parallel the Feature Generator Candidates.
+        NOTE: the parameter 'compute_feature_generators_for_infimum' may have a great impact on the execution time, since the infimum usually has a empty set in its extent.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            links (list): list with the links between Triadic Concepts
+            compute_feature_generators_for_infimum (boolean): parameter that the user can set in the input file (configs.json)
+
+        Returns:
+            triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
+        """
 
         def compute_f_generators_supremum(triadic_concepts):
+            """Takes the triadic_concepts, finds the supremum by ordering the concepts by the cardinality of the extents, and computes the Feature Generator Candidates for the supremum. 
+            The supremum has this special behavior because it does not have successors, so its Features Generator Candidates are created separately.
+
+            Args:
+                triadic_concepts (list): list of TriadicConcept objects
+
+            Returns:
+                triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
+            """
             triadic_concepts = sorted(
                 triadic_concepts, key=lambda x: x.extent_size, reverse=False)
             G = []
