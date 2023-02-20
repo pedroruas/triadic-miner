@@ -842,6 +842,14 @@ class TriadicConcept:
         return triadic_concepts
 
     def create_hasse_diagram(triadic_concepts, links, file_name):
+        """Takes the triadic_concepts, links and file_name to create the Hasse Diagram with all the links between the Triadic Concepts and annotaded with the Feature Generators. The Hasse Diagram is a .graphml file that can be displayed on external softwares (as yEd) and it is saved in the output folder that the user specified in the configs.json file.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            links (list): list with the links between Triadic Concepts
+            file_name (str): input file name
+
+        """
 
         nodes = []
         nodes_gen = []
