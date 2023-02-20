@@ -43,6 +43,15 @@ class AssociationRule:
         return f'({antecedent} -> {consequent}) {condition}\t(sup: {self.support}, conf: {self.confidence})\nConcept extent: {current_concept_extent}\nPredecessor concept: {predecessor_concept_extent}'
 
     def compute_BCAI_implications(triadic_concepts, minimum_support_rules):
+        """Takes the triadic_concepts and the minimum_support_rules value to compute the BCAI Implications that meets the minimum support value set up by the user.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            minimum_support_rules (float): minimum value set up by the user in the configs.json 
+
+        Returns:
+            BCAI_implications (list): list of AssociationRule objects representing the BCAI implications
+        """
 
         BCAI_implications = []
         _max_cardinality = max(
