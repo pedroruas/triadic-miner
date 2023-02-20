@@ -848,9 +848,8 @@ class TriadicConcept:
             triadic_concepts (list): list of TriadicConcept objects
             links (list): list with the links between Triadic Concepts
             file_name (str): input file name
-
         """
-
+        
         nodes = []
         nodes_gen = []
 
