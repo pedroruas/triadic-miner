@@ -153,6 +153,17 @@ class AssociationRule:
         return BACI_implications
 
     def compute_BCAAR_association_rules(triadic_concepts, minimum_support_rules, minimum_confidence_rules, links):
+        """Takes the triadic_concepts, minimum_support_rules, minimum_confidence_rules and the links to compute the BCAAR Assoction Rules that meets the minimum support value and the minimum confidence value set up by the user.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            minimum_support_rules (float): minimum value set up by the user in the configs.json
+            minimum_confidence_rules (float): minimum value set up by the user in the configs.json
+            links (list): list with the links between Triadic Concepts
+
+        Returns:
+            rules_BCAAR (list): list of AssociationRule objects representing the BCAAR association rules
+        """
 
         _max_cardinality = max(
             concept.extent_size for concept in triadic_concepts)
