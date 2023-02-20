@@ -219,8 +219,25 @@ class TriadicConcept:
         return context
 
     def f_generator(concept, links_dict, triadic_concepts):
+        """Takes the concept, links_dict and triadic_concepts to compute the Feature Generators Candidates for all Triadic Concepts extent in the list triadic_concepts.
+        This function is executed using a MapReduce approach based on multithreading.
+
+        Args:
+            concept (TriadicConcept): an object of the class TriadicConcept
+            links_dict (dict): a dict where an extent is the key, and the values are the successors' extent
+            triadic_concepts (list): list of all Triadic Concepts
+        """
 
         def compute_face_kth_successor(target_intent, target_modus):
+            """Takes the intent and modus part of a Triadic Concept that is a successor, and removes the shared features (by removing incidences from the context) from the current concept.
+
+            Args:
+                target_intent (list): list of intents associated with a Triadic Concept
+                target_modus (list): list of modus associated with a Triadic Concept
+
+            Returns:
+                pandas Dataframe: returns the context after removing the features from its successor
+            """
             for intent_item, modus_item in zip(target_intent, target_modus):
                 for x in intent_item:
                     for y in modus_item:
