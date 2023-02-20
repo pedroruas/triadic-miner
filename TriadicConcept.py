@@ -11,7 +11,7 @@ from itertools import repeat
 from concepts import Definition, Context
 import pyyed
 from itertools import chain, combinations
-import os
+
 
 EMPTY_SET = set([])
 PROCESSES = 8  # Amount of threads to be used in multithreading
