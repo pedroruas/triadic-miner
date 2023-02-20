@@ -6,7 +6,6 @@
 import json
 import os
 from Timer import Timer
-import timeit
 from TriadicConcept import TriadicConcept
 from AssociationRules import AssociationRule
 from Report import Report
