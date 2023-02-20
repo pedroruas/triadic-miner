@@ -167,6 +167,14 @@ class TriadicConcept:
         return links
 
     def list_of_links_to_dict(links):
+        """Takes the links between all the concepts and returns a dict with all the successors associated with each Triadic Concept extent.
+
+        Args:
+            links (list): list with the links between Triadic Concepts
+
+        Returns:
+            dict: returns a dict where an extent is the key, and the values are the successors' extent
+        """
         links_dic = {}
         for item in links:
             aux = []
