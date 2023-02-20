@@ -190,6 +190,15 @@ class TriadicConcept:
         return links_dic
 
     def getContext_K1K2(intent, modus):
+        """Takes the intent and the modus associated with a Triadic Concept and creates a formal context using a pandas Dataframe to represent it. 
+
+        Args:
+            intent (list): list of intents associated with a Triadic Concept
+            modus (list): list of modus associated with a Triadic Concept
+
+        Returns:
+            context (pandas Dataframe): returns a Dataframe annotated with the incidences (boolean)
+        """
 
         intent = [list(x) for x in intent]
         modus = [list(x) for x in modus]
