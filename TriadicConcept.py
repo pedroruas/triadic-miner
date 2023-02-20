@@ -20,6 +20,7 @@ PROCESSES = 8  # Amount of threads to be used while computing and validating Fea
 @dataclass(slots=True, order=True)
 class TriadicConcept:
     """Class that represents a triadic concept (extent, intent, modus)."""
+
     sort_index: int = field(init=False, repr=False)
     extent: set
     intent: set
@@ -52,6 +53,7 @@ class TriadicConcept:
         Returns:
                 list: returns a list of TriadicConcept objects
         """
+
         triadic_concepts = []
         with open(file_path, 'r') as reader:
             for row in reader:
@@ -95,6 +97,7 @@ class TriadicConcept:
             faces (dict): is a dictionary with the initial faces of each unique extents
             all_extents (set): is a set with all the unique extents
         """
+
         faces = {}
         all_extents = set()
         for concept in triadic_concepts:
@@ -115,6 +118,7 @@ class TriadicConcept:
         Returns:
                 links (list): returns a list with the links between Triadic Concepts
         """
+
         links = []
         border_max = 0  # border <- the very first element with the smallest EXTENT cardinality
         border = triadic_concepts[0].extent
@@ -175,6 +179,7 @@ class TriadicConcept:
         Returns:
             links_dic (dict): returns a dict where an extent is the key, and the values are the successors' extent
         """
+
         links_dic = {}
         for item in links:
             aux = []
@@ -238,6 +243,7 @@ class TriadicConcept:
             Returns:
                 context (pandas Dataframe): returns the context after removing the features from its successor
             """
+
             for intent_item, modus_item in zip(target_intent, target_modus):
                 for x in intent_item:
                     for y in modus_item:
@@ -400,6 +406,7 @@ class TriadicConcept:
             Returns:
                 triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Feature Generator Candidates
             """
+
             triadic_concepts = sorted(
                 triadic_concepts, key=lambda x: x.extent_size, reverse=False)
             G = []
@@ -455,6 +462,7 @@ class TriadicConcept:
         Returns:
             formal_context (concepts Context): returns the Formal Context representing all the Triadic Concepts
         """
+
         formal_context = Definition()
         for concept in tqdm(triadic_concepts):
             extent = [x for x in concept.extent]
@@ -486,6 +494,7 @@ class TriadicConcept:
             concept_extent (set): the extent of a TriadicConcept object
             updadet_triadic_concept (list): list of TriadicConcept objects
         """
+
         final_t_generator = []
         f_gens = triadic_concepts[triadic_concepts.index(
             set(concept_extent))].feature_generator_candidates
@@ -500,6 +509,7 @@ class TriadicConcept:
             Returns:
                 bool: if the attribute exists in the formal_context, returns True
             """
+
             for attribute in attributes:
                 if attribute not in formal_context.properties:
                     return False
@@ -515,6 +525,7 @@ class TriadicConcept:
             Returns:
                 bool: returns True if the result of derivation operation gives the same extent as the extent passed as parameter
             """
+
             if not attributes_in_properties(generator, formal_context):
                 return False
             extent_check = set(formal_context.extension(generator))
