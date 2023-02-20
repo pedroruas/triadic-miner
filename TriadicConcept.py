@@ -385,6 +385,7 @@ class TriadicConcept:
 
     def compute_f_generators_candidates(triadic_concepts, links, compute_feature_generators_for_infimum):
         """Takes triadic_concepts, links and the parameter from the user compute_feature_generators_for_infimum to call the function 'f_generators' to compute in parallel the Feature Generator Candidates.
+
         NOTE: the parameter 'compute_feature_generators_for_infimum' may have a great impact on the execution time, since the infimum usually has a empty set in its extent.
 
         Args:
@@ -626,6 +627,18 @@ class TriadicConcept:
         return triadic_concepts
 
     def concept_stability_calculation(concept, triadic_concepts, formal_context):
+        """Takes the concept, triadic_concepts and formal_context and computes the Concept Stability for each Triadic Concept. This is done by computing the powerset(extent). This function is executed in parallel using a multithreading approach.
+
+        NOTE: since the powerset of the elements in the extent of all Triadic Concepts is computed, it has a great impact on the execution time when the input file gets bigger (large number of Triadic Concepts).
+
+        Args:
+            concept (TriadicConcept): an object of the class TriadicConcept
+            triadic_concepts (list): list of TriadicConcept objects
+            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+
+        Returns:
+            list_concept_stability (list): returns the Concept Stability for each Triadic Concept object
+        """
 
         def powerset(iterable):
             "list(powerset([1,2,3])) --> [(), (1,), (2,), (3,), (1,2), (1,3), (2,3), (1,2,3)] "
