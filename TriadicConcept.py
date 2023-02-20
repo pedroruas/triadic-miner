@@ -87,10 +87,10 @@ class TriadicConcept:
 
     def create_triadic_concepts_faces(triadic_concepts):
         """Takes the list of TriadicConcepts and returns the initialized Faces and the the set of all unique extents
-        
+
         Args:
             triadic_concepts (list): list of objects of the class TriadicConcept
-        
+
         Returns:
             faces (dict): is a dictionary with the initial faces of each unique extents
             all_extents (set): is a set with all the unique extents
@@ -104,10 +104,13 @@ class TriadicConcept:
         return faces, all_extents
 
     def T_iPred(triadic_concepts, faces, all_extents):
-        """Function that calculates the links between Triadic Concepts
+        """Takes the list of triadic concepts, the initial Faces and the unique extents of triadic concepts 
+        and calculates the links between triadic concepts.
 
         Args:
                 triadic_concepts (list): list of TriadicConcept objects
+                faces (dict): initial data structure to calculate the Faces
+                all_extents (set): a set with all unique extents in triadic_concepts
 
         Returns:
                 list: returns a list with the links between Triadic Concepts
