@@ -46,7 +46,9 @@ class Report():
             '{:.4}'.format(total_time), '{:.4}'.format(total_time/60), '{:.4}'.format(total_time/3600)))
         file.close()
 
-    def save_triadic_concepts(self, triadic_concepts, triadic_concepts_file_path):
+    def save_triadic_concepts(self,
+                              triadic_concepts,
+                              triadic_concepts_file_path):
 
         file = open(triadic_concepts_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'TRIADIC CONCEPTS', 7)
@@ -71,7 +73,9 @@ class Report():
             file.write('\n')
         file.close()
 
-    def save_links(self, links, links_concepts_file_path):
+    def save_links(self,
+                   links,
+                   links_concepts_file_path):
 
         file = open(links_concepts_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'LINKS COMPUTED BY T-iPRED', 7)
@@ -87,7 +91,9 @@ class Report():
             file.write(str(concept + ' --> ' + target + '\n'))
         file.close()
 
-    def save_feature_generators(self, triadic_concepts, feature_generators_file_path):
+    def save_feature_generators(self,
+                                triadic_concepts,
+                                feature_generators_file_path):
 
         file = open(feature_generators_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'FEATURES GENERATORS', 7)
@@ -112,7 +118,9 @@ class Report():
             file.write('\n\n')
         file.close()
 
-    def save_BCAI_implications(self, BCAI_implications, BCAI_implications_file_path):
+    def save_BCAI_implications(self,
+                               BCAI_implications,
+                               BCAI_implications_file_path):
 
         file = open(BCAI_implications_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'BCAI IMPLICATIONS', 7)
@@ -130,7 +138,9 @@ class Report():
                 left_part, right_part, condition, support, confidence))
         file.close()
 
-    def save_BACI_implications(self, BACI_implications, BACI_implications_file_path):
+    def save_BACI_implications(self,
+                               BACI_implications,
+                               BACI_implications_file_path):
 
         file = open(BACI_implications_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'BACI IMPLICATIONS', 7)
@@ -148,7 +158,9 @@ class Report():
                 left_part, right_part, condition, support, confidence))
         file.close()
 
-    def save_BCAAR_rules(self, BCAAR_rules, BCAAR_rules_file_path):
+    def save_BCAAR_rules(self,
+                         BCAAR_rules,
+                         BCAAR_rules_file_path):
 
         file = open(BCAAR_rules_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'BCAAR ASSOCIATION RULES', 6)
@@ -166,7 +178,9 @@ class Report():
                 left_part, right_part, condition, support, confidence))
         file.close()
 
-    def save_BACAR_rules(self, BACAR_rules, BACAR_rules_file_path):
+    def save_BACAR_rules(self,
+                         BACAR_rules,
+                         BACAR_rules_file_path):
 
         file = open(BACAR_rules_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'BACAR ASSOCIATION RULES', 6)
@@ -184,7 +198,9 @@ class Report():
                 left_part, right_part, condition, support, confidence))
         file.close()
 
-    def save_concept_stability(self, triadic_concepts, concept_stability_file_path):
+    def save_concept_stability(self,
+                               triadic_concepts,
+                               concept_stability_file_path):
 
         file = open(concept_stability_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'CONCEPT STABILITY', 7)
@@ -211,7 +227,9 @@ class Report():
             file.write('\n')
         file.close()
 
-    def save_separation_index(self, triadic_concepts, separation_index_file_path):
+    def save_separation_index(self,
+                              triadic_concepts,
+                              separation_index_file_path):
 
         file = open(separation_index_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'SEPARATION INDEX', 7)
