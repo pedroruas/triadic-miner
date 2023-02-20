@@ -564,7 +564,7 @@ class TriadicConcept:
 
         Returns:
             concept_extent (set): the extent of a TriadicConcept object
-            updadet_triadic_concept (list): list of TriadicConcept objects
+            updadet_triadic_concept (list): updated list of TriadicConcept objects
         """
 
         f_gens = triadic_concepts[triadic_concepts.index(
@@ -599,6 +599,15 @@ class TriadicConcept:
         return concept_extent, updadet_triadic_concept
 
     def compute_feature_generator_validation(triadic_concepts, formal_context):
+        """Takes the triadic_concepts and formal_context to call the function the will validate the Feature Generator Candidates using a multithreading approach. 
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+
+        Returns:
+            triadic_concepts (list): updated list of TriadicConcept objects annotaded with the Minimal Feature Generators
+        """
 
         ext_uniques = [concept.extent for concept in triadic_concepts]
 
