@@ -474,18 +474,47 @@ class TriadicConcept:
         return Context(*formal_context)
 
     def validade_feature_generator_candidates(concept_extent, triadic_concepts, formal_context):
+        """Takes the concept_extent, triadic_concepts and formal_context in order to validate if a Feature Generator Candidate is in fact associated with an extent. This is done by derivating a Feature Generator and checking if the result is the same as the extent in 'concept_extent'.
+        This function is executed in parallel using a multithreading approach.
 
+        Args:
+            concept_extent (set): extent of a TriadicConcept object
+            triadic_concepts (list): list of TriadicConcept objects
+            formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+
+        Returns:
+            concept_extent (set): the extent of a TriadicConcept object
+            updadet_triadic_concept (list): list of TriadicConcept objects
+        """
         final_t_generator = []
         f_gens = triadic_concepts[triadic_concepts.index(
             set(concept_extent))].feature_generator_candidates
 
         def attributes_in_properties(attributes, formal_context):
+            """Takes the attributes (intent x modus) and the formal_context in order to check if the attribute is in fact in the formal_context.
+
+            Args:
+                attributes (str): string representing the attribute (intent x modus)
+                formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+
+            Returns:
+                bool: if the attribute exists in the formal_context, returns True
+            """
             for attribute in attributes:
                 if attribute not in formal_context.properties:
                     return False
             return True
 
         def check_if_generator_belongs_to_extent(extent, generator, formal_context):
+            """Takes the extent, generator, formal_context and check a Feature Generator is associated with an extent.
+            Args:
+                extent (set): the extent of a TriadicConcept
+                generator (list): the pair of intent and modus of a Feature Generator
+                formal_context (concepts Context): the Formal Context representing all the Triadic Concepts
+
+            Returns:
+                bool: returns True if the result of derivation operation gives the same extent as the extent passed as parameter
+            """
             if not attributes_in_properties(generator, formal_context):
                 return False
             extent_check = set(formal_context.extension(generator))
