@@ -9,7 +9,7 @@ EMPTY_SET = set([])
 
 
 class Report():
-
+    
     def __init__(self, file_path, file_name):
         self.file_path = file_path
         self.file_name = file_name
@@ -23,10 +23,10 @@ class Report():
         if not os.path.isdir(self.file_path.split('/')[0]):
             os.mkdir(self.file_path.split('/')[0])
 
-    def write_header(file, title, number_identation):
+    def write_header(file, title, number_indentation):
 
         file.write('*' + '='*75 + '*\n')
-        file.write('\t'*number_identation + title + '\n')
+        file.write('\t'*number_indentation + title + '\n')
         file.write('*' + '='*75 + '*' + '\n\n')
 
     def save_report(self):
