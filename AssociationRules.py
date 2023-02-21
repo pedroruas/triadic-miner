@@ -12,7 +12,7 @@ EMPTY_SET = set([])
 @dataclass(slots=True, order=True)
 class AssociationRule:
     """Class that represents a association rule (including implications).
-        The folowing rules are beeing computed:
+        The following rules are being computed:
             - Biedermann Conditional Attribute Association Rule (BCAAR)
             - Biedermann Attributional Condition Association Rule (BACAR)
             - Biedermann Conditional Attribute Implication (BCAI)
@@ -418,3 +418,43 @@ class AssociationRule:
                                         rules_BACAR.append(rule)
 
         return rules_BACAR
+
+    def compute_extensional_implications(triadic_concepts):
+        extensional_implications = []
+
+        for concept in triadic_concepts:
+            generators = triadic_concepts[triadic_concepts.index(
+                concept.extent)].extensional_generator_minimal
+            if generators != []:
+                gen = next(iter(generators))
+
+                if isinstance(gen, str):
+                    rule = AssociationRule(antecedent=set(gen),
+                                           consequent=set(
+                                               concept.extent) - set(gen),
+                                           current_concept_extent=concept.extent,
+                                           confidence=1.0)
+                    if (rule not in extensional_implications) and (rule.consequent != EMPTY_SET):
+                        extensional_implications.append(rule)
+                else:
+                    for gen in generators:
+                        rule = AssociationRule(antecedent=set(gen),
+                                               consequent=set(
+                                                   concept.extent) - set(gen),
+                                               current_concept_extent=concept.extent,
+                                               confidence=1.0)
+                        if (rule not in extensional_implications) and (rule.consequent != EMPTY_SET):
+                            extensional_implications.append(rule)
+        
+        temp_extensional_implications = extensional_implications.copy()
+        rules_to_remove = []
+        for rule1 in extensional_implications:
+            for rule2 in reversed(temp_extensional_implications):
+                if rule1 != rule2:
+                    if set(rule2.antecedent).issubset(set(rule1.antecedent)) and set(rule2.consequent).issubset(set(rule1.consequent)):
+                        rules_to_remove.append(rule2)
+        for rule in rules_to_remove:
+            if rule in extensional_implications:
+                extensional_implications.remove(rule)
+        
+        return extensional_implications
