@@ -28,7 +28,8 @@ def triadic_miner(file_path,
                   BCAAR_rules_file_path,
                   BACAR_rules_file_path,
                   concept_stability_file_path,
-                  separation_index_file_path):
+                  separation_index_file_path,
+                  hasse_diagram_file_path):
 
     report = Report(report_file_path, file_name)
     report.check_output_folder()
@@ -113,7 +114,7 @@ def triadic_miner(file_path,
     if save_hasse_diagram:
         Timer.start("Creating the Hasse Diagram")
         TriadicConcept.create_hasse_diagram(
-            updated_triadic_concepts, links, file_name)
+            updated_triadic_concepts, links, hasse_diagram_file_path)
         time = Timer.stop()
         report.add_module_time('Creating the Hasse Diagram', time)
 
@@ -174,6 +175,8 @@ def main():
             output_dir, file_name)
         separation_index_file_path = '{0}{1}.separation_index'.format(
             output_dir, file_name)
+        hasse_diagram_file_path = '{0}{1}.graphml'.format(
+            output_dir, file_name+'_hasse_diagram')
 
         triadic_miner(input_file_path,
                       file_name,
@@ -191,7 +194,8 @@ def main():
                       BCAAR_rules_file_path,
                       BACAR_rules_file_path,
                       concept_stability_file_path,
-                      separation_index_file_path)
+                      separation_index_file_path,
+                      hasse_diagram_file_path)
 
 
 if __name__ == "__main__":
