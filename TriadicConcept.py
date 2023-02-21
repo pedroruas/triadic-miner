@@ -1006,3 +1006,89 @@ class TriadicConcept:
 
         hasse.write_graph('output/' + file_name +
                           '_hasse_diagram.graphml', pretty_print=True)
+
+    def create_hasse_diagram_v2(triadic_concepts, links, file_name):
+        """Takes the triadic_concepts, links and file_name to create the
+        Hasse Diagram with all the links between the Triadic Concepts and
+        annotaded with the Feature Generators.
+        The Hasse Diagram is a .graphml file that can be displayed on
+        external softwares (as yEd) and it is saved in the output folder
+        that the user specified in the configs.json file.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            links (list): list with the links between Triadic Concepts
+            file_name (str): input file name
+        """
+
+        nodes = []
+
+        def format_generators(generators):
+            t_gens = []
+            if generators == []:
+                return 'ø'
+            for v in generators:
+                if isinstance(v[0], list):
+                    intent = [', '.join(x for x in sorted(v[0]))]
+                    modus = [', '.join(x for x in sorted(v[1]))]
+                    t_gen = str(
+                        "(" + ', '.join([x for x in intent])) + " - " + str(', '.join([x for x in modus]))+")"
+                    t_gens.append(t_gen)
+                else:
+                    t_gen = "(" + str(v[0]) + " - " + str(v[1]) + ")"
+                    t_gens.append(t_gen)
+            if len(t_gens) > 1:
+                return ["\n".join(x for x in t_gens)][0]
+            else:
+                return t_gens[0]
+
+        def check_concept(concept, concept_original, nodes):
+            if concept not in nodes:
+                attributes = []
+
+                concep_intent = triadic_concepts[triadic_concepts.index(
+                    concept_original)].intent
+                concept_modus = triadic_concepts[triadic_concepts.index(
+                    concept_original)].modus
+                concept_generators = triadic_concepts[triadic_concepts.index(
+                    concept_original)].feature_generator_minimal
+
+                for attribute in zip(concep_intent, concept_modus):
+                    _int = str(', '.join(x for x in sorted(attribute[0])))
+                    _modus = str(
+                        ', '.join(x for x in sorted(attribute[1])))
+                    attributes.append(
+                        str('({0} - {1})'.format(_int, _modus)))
+
+                hasse.add_node(concept, shape_fill="#FFFFFF",
+                               shape="roundrectangle", font_size="14")
+                label = str('Features:\n'+'\n'.join(x for x in attributes))
+                hasse.add_node(concept+'concepts', label=label, shape_fill="#faddb1",
+                               shape="rectangle", font_size="14")
+                hasse.add_edge(concept+'concepts', concept,
+                               line_type='dotted', arrowhead='none')
+                nodes.append(concept)
+                generators = format_generators(concept_generators)
+                hasse.add_node(concept+'gen', label='F-generators:\n'+generators, shape_fill="#cee2f7",
+                               shape="rectangle", font_size="14")
+                hasse.add_edge(concept+'gen', concept,
+                               line_type='dotted', arrowhead='none')
+
+        hasse = pyyed.Graph()
+        for link in links:
+            concept, sucessor = link[0], link[1]
+            concept_original = concept.copy()
+            sucessor_original = sucessor.copy()
+            if concept == EMPTY_SET:
+                concept = 'ø'
+            if sucessor == EMPTY_SET:
+                sucessor = 'ø'
+            concept = str(', '.join(x for x in sorted(concept)))
+            sucessor = str(', '.join(x for x in sorted(sucessor)))
+
+            check_concept(concept, concept_original, nodes)
+            check_concept(sucessor, sucessor_original, nodes)
+            hasse.add_edge(concept, sucessor, arrowhead='t_shape')
+
+        hasse.write_graph('output/' + file_name +
+                          '_hasse_diagram_v2.graphml', pretty_print=True)
