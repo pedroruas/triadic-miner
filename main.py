@@ -97,6 +97,18 @@ def triadic_miner(file_path,
     time = Timer.stop()
     report.add_module_time('Computing BACAR Association Rules', time)
 
+    Timer.start("Computing Extensional Generators")
+    updated_triadic_concepts = TriadicConcept.compute_extensional_generators(
+        updated_triadic_concepts, links)
+    time = Timer.stop()
+    report.add_module_time('Computing Extensional Generators', time)
+
+    Timer.start("Computing Extensional Implications")
+    extensional_rules = AssociationRule.compute_extensional_implications(
+        updated_triadic_concepts)
+    time = Timer.stop()
+    report.add_module_time('Computing Extensional Implications', time)
+
     if compute_concept_stability:
         Timer.start("Computing Concept Stability")
         updated_triadic_concepts = TriadicConcept.compute_concept_stability(
