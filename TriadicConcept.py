@@ -406,10 +406,10 @@ class TriadicConcept:
             F = []
             U3 = []
 
-        updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
+        updated_triadic_concept = triadic_concepts[triadic_concepts.index(
             current_concept_extent)].feature_generator_candidates = t_generator
 
-        return updadet_triadic_concept
+        return updated_triadic_concept
 
     def compute_f_generators_candidates(triadic_concepts,
                                         links,
@@ -430,7 +430,7 @@ class TriadicConcept:
 
         Returns:
             triadic_concepts (list): updated list of TriadicConcept objects
-            annotaded with the Feature Generator Candidates
+            annotated with the Feature Generator Candidates
         """
 
         def compute_f_generators_supremum(triadic_concepts):
@@ -446,7 +446,7 @@ class TriadicConcept:
 
             Returns:
                 triadic_concepts (list): updated list of TriadicConcept
-                objects annotaded with the Feature Generator Candidates
+                objects annotated with the Feature Generator Candidates
             """
 
             triadic_concepts = sorted(
@@ -525,7 +525,7 @@ class TriadicConcept:
 
         return Context(*formal_context)
 
-    def validade_feature_generator_candidates(concept_extent,
+    def validate_feature_generator_candidates(concept_extent,
                                               triadic_concepts,
                                               formal_context):
         """Takes the concept_extent, triadic_concepts and formal_context in
@@ -543,7 +543,7 @@ class TriadicConcept:
 
         Returns:
             concept_extent (set): the extent of a TriadicConcept object
-            updadet_triadic_concept (list): list of TriadicConcept objects
+            updated_triadic_concept (list): list of TriadicConcept objects
         """
 
         final_t_generator = []
@@ -611,27 +611,27 @@ class TriadicConcept:
                 if check_if_generator_belongs_to_extent(concept_extent, to_check, formal_context) and generator not in final_t_generator:
                     final_t_generator.extend([generator])
 
-        updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
+        updated_triadic_concept = triadic_concepts[triadic_concepts.index(
             concept_extent)].feature_generator = final_t_generator
 
-        return concept_extent, updadet_triadic_concept
+        return concept_extent, updated_triadic_concept
 
     def compute_minimality_feature_generators(concept_extent,
                                               triadic_concepts):
         """Takes the concept_extent and triadic_concepts to compute
         the minimality test on Feature Generators.
-        Since we are interrested in Minimal Feature generators,
+        Since we are interested in Minimal Feature generators,
         this function compares the compatible Generators and removes
         non Minimal Generators from the list associated with a Triadic Concept.
 
         Args:
             concept_extent (set): the extent of a TriadicConcept
             triadic_concepts (list): updated list of TriadicConcept objects
-            annotaded with the Feature Generator Candidates
+            annotated with the Feature Generator Candidates
 
         Returns:
             concept_extent (set): the extent of a TriadicConcept object
-            updadet_triadic_concept (list): updated list of
+            updated_triadic_concept (list): updated list of
             TriadicConcept objects
         """
 
@@ -661,10 +661,10 @@ class TriadicConcept:
                         if generator in f_gens_final:
                             f_gens_final.remove(generator)
 
-        updadet_triadic_concept = triadic_concepts[triadic_concepts.index(
+        updated_triadic_concept = triadic_concepts[triadic_concepts.index(
             concept_extent)].feature_generator_minimal = f_gens_final
 
-        return concept_extent, updadet_triadic_concept
+        return concept_extent, updated_triadic_concept
 
     def compute_feature_generator_validation(triadic_concepts, formal_context):
         """Takes the triadic_concepts and formal_context to call the function
@@ -678,14 +678,14 @@ class TriadicConcept:
 
         Returns:
             triadic_concepts (list): updated list of TriadicConcept objects
-            annotaded with the Minimal Feature Generators
+            annotated with the Minimal Feature Generators
         """
 
         ext_uniques = [concept.extent for concept in triadic_concepts]
 
         pool = ThreadPool(PROCESSES)
         for result in pool.starmap(
-            TriadicConcept.validade_feature_generator_candidates,
+            TriadicConcept.validate_feature_generator_candidates,
             zip(ext_uniques, repeat(triadic_concepts),
                 repeat(formal_context))):
             triadic_concepts[triadic_concepts.index(
@@ -937,10 +937,10 @@ class TriadicConcept:
 
         return triadic_concepts
 
-    def create_hasse_diagram(triadic_concepts, links, file_name):
-        """Takes the triadic_concepts, links and file_name to create the
+    def create_hasse_diagram(triadic_concepts, links, hasse_diagram_file_path):
+        """Takes the triadic_concepts, links and hasse_diagram_file_path to create the
         Hasse Diagram with all the links between the Triadic Concepts and
-        annotaded with the Feature Generators.
+        annotated with the Feature Generators.
         The Hasse Diagram is a .graphml file that can be displayed on
         external softwares (as yEd) and it is saved in the output folder
         that the user specified in the configs.json file.
@@ -950,77 +950,7 @@ class TriadicConcept:
             links (list): list with the links between Triadic Concepts
             file_name (str): input file name
         """
-
-        nodes = []
-        nodes_gen = []
-
-        def format_generators(generators):
-            t_gens = []
-            if generators == []:
-                return None
-            for v in generators:
-                if isinstance(v[0], list):
-                    intent = [', '.join(x for x in sorted(v[0]))]
-                    modus = [', '.join(x for x in sorted(v[1]))]
-                    t_gen = str(
-                        "(" + ', '.join([x for x in intent])) + " - " + str(', '.join([x for x in modus]))+")"
-                    t_gens.append(t_gen)
-                else:
-                    t_gen = "(" + str(v[0]) + " - " + str(v[1]) + ")"
-                    t_gens.append(t_gen)
-            if len(t_gens) > 1:
-                return ["\n".join(x for x in t_gens)][0]
-            else:
-                return t_gens[0]
-
-        def check_concept_is_in_hasse(concept, concept_original):
-
-            if concept not in nodes:
-                hasse.add_node(concept, shape_fill="#FFFFFF",
-                               shape="ellipse", font_size="14")
-                nodes.append(concept)
-                generator = format_generators(triadic_concepts[triadic_concepts.index(
-                    concept_original)].feature_generator_minimal)
-                if generator != None:
-                    if generator not in nodes_gen:
-                        nodes_gen.append(generator)
-                        hasse.add_node(generator, shape_fill="#99CCFF",
-                                       shape="rectangle", font_size="14")
-                    hasse.add_edge(str(generator), str(concept))
-
-        hasse = pyyed.Graph()
-        for link in tqdm(links):
-            concept, sucessor = link[0], link[1]
-            concept_original = concept.copy()
-            sucessor_original = sucessor.copy()
-            if concept == EMPTY_SET:
-                concept = 'ø'
-            if sucessor == EMPTY_SET:
-                sucessor = 'ø'
-            concept = str(', '.join(x for x in sorted(concept)))
-            sucessor = str(', '.join(x for x in sorted(sucessor)))
-
-            check_concept_is_in_hasse(concept, concept_original)
-            check_concept_is_in_hasse(sucessor, sucessor_original)
-            hasse.add_edge(str(concept), str(sucessor))
-
-        hasse.write_graph('output/' + file_name +
-                          '_hasse_diagram.graphml', pretty_print=True)
-
-    def create_hasse_diagram_v2(triadic_concepts, links, file_name):
-        """Takes the triadic_concepts, links and file_name to create the
-        Hasse Diagram with all the links between the Triadic Concepts and
-        annotaded with the Feature Generators.
-        The Hasse Diagram is a .graphml file that can be displayed on
-        external softwares (as yEd) and it is saved in the output folder
-        that the user specified in the configs.json file.
-
-        Args:
-            triadic_concepts (list): list of TriadicConcept objects
-            links (list): list with the links between Triadic Concepts
-            file_name (str): input file name
-        """
-
+        
         nodes = []
 
         def format_generators(generators):
@@ -1046,14 +976,14 @@ class TriadicConcept:
             if concept not in nodes:
                 attributes = []
 
-                concep_intent = triadic_concepts[triadic_concepts.index(
+                concept_intent = triadic_concepts[triadic_concepts.index(
                     concept_original)].intent
                 concept_modus = triadic_concepts[triadic_concepts.index(
                     concept_original)].modus
                 concept_generators = triadic_concepts[triadic_concepts.index(
                     concept_original)].feature_generator_minimal
 
-                for attribute in zip(concep_intent, concept_modus):
+                for attribute in zip(concept_intent, concept_modus):
                     _int = str(', '.join(x for x in sorted(attribute[0])))
                     _modus = str(
                         ', '.join(x for x in sorted(attribute[1])))
@@ -1075,20 +1005,19 @@ class TriadicConcept:
                                line_type='dotted', arrowhead='none')
 
         hasse = pyyed.Graph()
-        for link in links:
-            concept, sucessor = link[0], link[1]
+        for link in tqdm(links):
+            concept, successor = link[0], link[1]
             concept_original = concept.copy()
-            sucessor_original = sucessor.copy()
+            successor_original = successor.copy()
             if concept == EMPTY_SET:
                 concept = 'ø'
-            if sucessor == EMPTY_SET:
-                sucessor = 'ø'
+            if successor == EMPTY_SET:
+                successor = 'ø'
             concept = str(', '.join(x for x in sorted(concept)))
-            sucessor = str(', '.join(x for x in sorted(sucessor)))
+            successor = str(', '.join(x for x in sorted(successor)))
 
             check_concept(concept, concept_original, nodes)
-            check_concept(sucessor, sucessor_original, nodes)
-            hasse.add_edge(concept, sucessor, arrowhead='t_shape')
+            check_concept(successor, successor_original, nodes)
+            hasse.add_edge(concept, successor, arrowhead='t_shape')
 
-        hasse.write_graph('output/' + file_name +
-                          '_hasse_diagram_v2.graphml', pretty_print=True)
+        hasse.write_graph(hasse_diagram_file_path, pretty_print=True)
