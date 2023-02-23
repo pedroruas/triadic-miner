@@ -16,6 +16,7 @@ def triadic_miner(file_path,
                   minimum_support_rules,
                   minimum_confidence_rules,
                   compute_feature_generators_for_infimum,
+                  compute_extensional_implications,
                   compute_concept_stability,
                   compute_separation_index,
                   save_hasse_diagram,
@@ -23,6 +24,8 @@ def triadic_miner(file_path,
                   triadic_concepts_file_path,
                   links_concepts_file_path,
                   feature_generators_file_path,
+                  extensional_generators_file_path,
+                  extensional_implications_file_path,
                   BCAI_implications_file_path,
                   BACI_implications_file_path,
                   BCAAR_rules_file_path,
@@ -97,17 +100,18 @@ def triadic_miner(file_path,
     time = Timer.stop()
     report.add_module_time('Computing BACAR Association Rules', time)
 
-    Timer.start("Computing Extensional Generators")
-    updated_triadic_concepts = TriadicConcept.compute_extensional_generators(
-        updated_triadic_concepts, links)
-    time = Timer.stop()
-    report.add_module_time('Computing Extensional Generators', time)
+    if compute_extensional_implications:
+        Timer.start("Computing Extensional Generators")
+        updated_triadic_concepts = TriadicConcept.compute_extensional_generators(
+            updated_triadic_concepts, links)
+        time = Timer.stop()
+        report.add_module_time('Computing Extensional Generators', time)
 
-    Timer.start("Computing Extensional Implications")
-    extensional_rules = AssociationRule.compute_extensional_implications(
-        updated_triadic_concepts)
-    time = Timer.stop()
-    report.add_module_time('Computing Extensional Implications', time)
+        Timer.start("Computing Extensional Implications")
+        extensional_implications = AssociationRule.compute_extensional_implications(
+            updated_triadic_concepts, minimum_confidence_rules)
+        time = Timer.stop()
+        report.add_module_time('Computing Extensional Implications', time)
 
     if compute_concept_stability:
         Timer.start("Computing Concept Stability")
@@ -147,7 +151,12 @@ def triadic_miner(file_path,
             updated_triadic_concepts, concept_stability_file_path)
     if compute_separation_index:
         report.save_separation_index(
-            triadic_concepts, separation_index_file_path)
+            updated_triadic_concepts, separation_index_file_path)
+    if compute_extensional_implications:
+        report.save_extensional_generators(
+            updated_triadic_concepts, extensional_generators_file_path)
+        report.save_extensional_implications(
+            extensional_implications, extensional_implications_file_path)
 
 
 def main():
@@ -168,6 +177,8 @@ def main():
         compute_separation_index = data['compute_separation_index']
         save_hasse_diagram = data[
             'save_hasse_diagram']
+        compute_extensional_implications = data[
+            'compute_extensional_implications']
 
         report_file_path = '{0}{1}.report'.format(output_dir, file_name)
         triadic_concepts_file_path = '{0}{1}.concepts'.format(
@@ -189,18 +200,25 @@ def main():
             output_dir, file_name)
         hasse_diagram_file_path = '{0}{1}.graphml'.format(
             output_dir, file_name+'_hasse_diagram')
+        extensional_generators_file_path = '{0}{1}.ext_generators'.format(
+            output_dir, file_name)
+        extensional_implications_file_path = '{0}{1}.ext_implications'.format(
+            output_dir, file_name)
 
         triadic_miner(input_file_path,
                       file_name,
                       minimum_support_rules,
                       minimum_confidence_rules,
                       compute_feature_generators_for_infimum,
+                      compute_extensional_implications,
                       compute_concept_stability,
                       compute_separation_index,
                       save_hasse_diagram, report_file_path,
                       triadic_concepts_file_path,
                       links_concepts_file_path,
                       feature_generators_file_path,
+                      extensional_generators_file_path,
+                      extensional_implications_file_path,
                       BCAI_implications_file_path,
                       BACI_implications_file_path,
                       BCAAR_rules_file_path,
