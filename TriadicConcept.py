@@ -844,12 +844,9 @@ class TriadicConcept:
         size_A3 = 0
         list_separation_index = []
         list_appear_A2_A3 = []
-
         dic_count_extent = {}
         dic_count_intent_modus = {}
         list_appear_extent_intent_modus = []
-        count_intent = 0
-        count_modus = 0
 
         for concept in tqdm(triadic_concepts):
             extent = [x for x in concept.extent]
