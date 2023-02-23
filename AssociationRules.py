@@ -170,7 +170,7 @@ class AssociationRule:
                                         links):
         """Takes the triadic_concepts, minimum_support_rules,
         minimum_confidence_rules and the links to compute the
-        BCAAR Assoction Rules that meets the minimum support value and
+        BCAAR Association Rules that meets the minimum support value and
         the minimum confidence value set up by the user.
 
         Args:
@@ -296,7 +296,7 @@ class AssociationRule:
                                         links):
         """Takes the triadic_concepts, minimum_support_rules,
         minimum_confidence_rules and the links to compute the
-        BACAR Assoction Rules that meets the minimum support value
+        BACAR Association Rules that meets the minimum support value
         and the minimum confidence value set up by the user.
 
         Args:
@@ -419,7 +419,7 @@ class AssociationRule:
 
         return rules_BACAR
 
-    def compute_extensional_implications(triadic_concepts):
+    def compute_extensional_implications(triadic_concepts, minimum_confidence_rules):
         extensional_implications = []
 
         for concept in triadic_concepts:
@@ -434,7 +434,7 @@ class AssociationRule:
                                                concept.extent) - set(gen),
                                            current_concept_extent=concept.extent,
                                            confidence=1.0)
-                    if (rule not in extensional_implications) and (rule.consequent != EMPTY_SET):
+                    if (rule not in extensional_implications) and (rule.consequent != EMPTY_SET) and (rule.confidence >= minimum_confidence_rules):
                         extensional_implications.append(rule)
                 else:
                     for gen in generators:
@@ -443,9 +443,9 @@ class AssociationRule:
                                                    concept.extent) - set(gen),
                                                current_concept_extent=concept.extent,
                                                confidence=1.0)
-                        if (rule not in extensional_implications) and (rule.consequent != EMPTY_SET):
+                        if (rule not in extensional_implications) and (rule.consequent != EMPTY_SET) and (rule.confidence >= minimum_confidence_rules):
                             extensional_implications.append(rule)
-        
+
         temp_extensional_implications = extensional_implications.copy()
         rules_to_remove = []
         for rule1 in extensional_implications:
@@ -456,5 +456,5 @@ class AssociationRule:
         for rule in rules_to_remove:
             if rule in extensional_implications:
                 extensional_implications.remove(rule)
-        
+
         return extensional_implications
