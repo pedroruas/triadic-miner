@@ -833,7 +833,7 @@ class TriadicConcept:
 
         Returns:
             triadic_concepts (list): list of TriadicConcept objects
-            updated with Separation Index 
+            updated with Separation Index
         """
 
         sum_intent_modus = 0
@@ -942,21 +942,40 @@ class TriadicConcept:
         return triadic_concepts
 
     def compute_extensional_generators(triadic_concepts, links):
-        
-        def find_minimal_extensional_generators(triadic_concepts, links):
-            
+        """Takes the triadic_concepts and links to compute
+        Extensional Generators. These generators will be further
+        used to compute Extensional Implications.
+
+        Args:
+            triadic_concepts (list): list of TriadicConcept objects
+            links (list): list with the links between Triadic Concepts
+
+        Returns:
+            triadic_concepts (list): list of TriadicConcept objects
+            updated with Extensional Generators
+        """
+
+        def find_minimal_extensional_generators(triadic_concepts):
+            """Takes the triadic_concepts and tests for each
+            Extensional Generator Candidate whether they are
+            Minimal or not. It also checks for redundant generators.
+
+            Args:
+                triadic_concepts (list): list of TriadicConcept objects
+            """
+
             all_extents = [x.extent for x in triadic_concepts]
             to_remove = EMPTY_SET
-            
+
             for extent in all_extents:
                 triadic_concepts[triadic_concepts.index(
-                extent)].extensional_generator_minimal = triadic_concepts[triadic_concepts.index(
-                extent)].extensional_generator_candidates
-            
+                    extent)].extensional_generator_minimal = triadic_concepts[triadic_concepts.index(
+                        extent)].extensional_generator_candidates
+
             for concept in reversed(triadic_concepts):
                 extensional_generators = triadic_concepts[triadic_concepts.index(
-                concept.extent)].extensional_generator_minimal
-                
+                    concept.extent)].extensional_generator_minimal
+
                 for element in extensional_generators:
                     if set(element) in all_extents:
                         if len(element) > 1:
@@ -964,24 +983,27 @@ class TriadicConcept:
                         else:
                             to_remove = set(element)
                         new_gen = extensional_generators - to_remove
-                        triadic_concepts[triadic_concepts.index(concept.extent)].extensional_generator_minimal = new_gen
+                        triadic_concepts[triadic_concepts.index(
+                            concept.extent)].extensional_generator_minimal = new_gen
                         to_remove = EMPTY_SET
-                
+
                 for element in extensional_generators:
-                    check = triadic_concepts[triadic_concepts.index(concept.extent)].extensional_generator_minimal
+                    check = triadic_concepts[triadic_concepts.index(
+                        concept.extent)].extensional_generator_minimal
                     check = check - frozenset({element})
                     for gen in check:
                         if frozenset(element).issubset(frozenset(gen)):
                             to_remove = frozenset({gen})
                             new_gen = extensional_generators - to_remove
-                            triadic_concepts[triadic_concepts.index(concept.extent)].extensional_generator_minimal = new_gen
+                            triadic_concepts[triadic_concepts.index(
+                                concept.extent)].extensional_generator_minimal = new_gen
                         to_remove = EMPTY_SET
-            
+
             for concept in reversed(triadic_concepts):
                 if concept.extensional_generator_minimal == EMPTY_SET:
-                    triadic_concepts[triadic_concepts.index(concept.extent)].extensional_generator_minimal = concept.extent
-        
-        
+                    triadic_concepts[triadic_concepts.index(
+                        concept.extent)].extensional_generator_minimal = concept.extent
+
         for link in reversed(links):
             current_node = link[0]
             successor_node = link[1]
@@ -1010,11 +1032,11 @@ class TriadicConcept:
                             (frozenset(new_E_gen) | frozenset(E_gen)) - frozenset({generator}))
                     triadic_concepts[triadic_concepts.index(
                         current_node)].extensional_generator_candidates = E_gen
-        
-        find_minimal_extensional_generators(triadic_concepts, links)
-        
+
+        find_minimal_extensional_generators(triadic_concepts)
+
         return triadic_concepts
-    
+
     def create_hasse_diagram(triadic_concepts, links, hasse_diagram_file_path):
         """Takes the triadic_concepts, links and hasse_diagram_file_path to create the
         Hasse Diagram with all the links between the Triadic Concepts and
