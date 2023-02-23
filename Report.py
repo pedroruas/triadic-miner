@@ -9,7 +9,7 @@ EMPTY_SET = set([])
 
 
 class Report():
-    
+
     def __init__(self, file_path, file_name):
         self.file_path = file_path
         self.file_name = file_name
@@ -254,4 +254,46 @@ class Report():
             else:
                 file.write('[]\n')
             file.write('\n')
+        file.close()
+
+    def save_extensional_generators(self,
+                                    triadic_concepts,
+                                    extensional_generators_file_path):
+
+        file = open(extensional_generators_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'EXTENSIONAL GENERATORS', 7)
+
+        for concept in triadic_concepts:
+            extent = concept.extent
+            generators = concept.extensional_generator_minimal
+            if extent == EMPTY_SET:
+                extent = 'ø'
+            extent = str(
+                ', '.join([', '.join(x for x in sorted(extent))]))
+            file.write('EXTENT: {0}\n'.format(extent))
+            if generators != []:
+                for gen in generators:
+                    extent_gen = str(
+                        ', '.join([', '.join(x for x in sorted(gen))]))
+                    file.write('({0})\n'.format(extent_gen))
+            else:
+                file.write('ø\n')
+            file.write('\n\n')
+        file.close()
+
+    def save_extensional_implications(self,
+                                      extensional_implications,
+                                      extensional_implications_file_path):
+
+        file = open(extensional_implications_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'EXTENSIONAL IMPLICATIONS', 7)
+
+        for rule in extensional_implications:
+            left_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.antecedent))]))
+            right_part = str(
+                ', '.join([', '.join(x for x in sorted(rule.consequent))]))
+            confidence = rule.confidence
+            file.write('({0} -> {1}) \t (confidence = {2})\n'.format(
+                left_part, right_part, confidence))
         file.close()
