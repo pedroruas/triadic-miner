@@ -47,6 +47,11 @@ $ pip install -r requirements.txt
 $ python main.py
 ```
 
+We use the Triadic Concepts computed by the [Data Peeler](https://homepages.dcc.ufmg.br/~lcerf/fr/prototypes.html#d-peeler) algorithm as input in the Triadic Miner.
+
+For the Hasse Diagram representation, we are using the [GraphML](http://graphml.graphdrawing.org/) ([GraphML Primer](http://graphml.graphdrawing.org/primer/graphml-primer.html)) file format. This is an open standard based on XML, and is supported by Python libraries such as [NetworkX](https://networkx.org/). 
+We recommend the [yEd Graph Editor](https://www.yworks.com/products/yed) software to visualize and explore the Hasse Diagram.
+
 # Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
