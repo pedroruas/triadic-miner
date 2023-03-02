@@ -34,13 +34,32 @@ class TriadicConcept:
     concept_stability: list[list] = field(default_factory=list)
     separation_index: list[list] = field(default_factory=list)
     conceptual_relevance: list[list] = field(default_factory=list)
-    
+    concept_similarities: list[list] = field(default_factory=list)
+
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f"Extent: {self.extent}\nIntent: {self.intent}\
-                \nModus: {self.modus}\nExtent size: {self.extent_size}\
+
+        def format_concept_similarity(self):
+            pairs = self.concept_similarities
+            formatted = []
+            for x in pairs[0]:
+                current, target, sim = x[0], x[1], x[2]
+                current = str(','.join([','.join(x for x in sorted(current))]))
+                target = str(','.join([','.join(x for x in sorted(target))]))
+                if current == '':
+                    current = 'ø'
+                if target == '':
+                    target = 'ø'
+                formatted.append(
+                    str('({0} -> {1}) = {2}'.format(current, target, sim)))
+            return formatted
+
+        return f"Extent: {self.extent}\
+                \nIntent: {self.intent}\
+                \nModus: {self.modus}\
+                \nExtent size: {self.extent_size}\
                 \nFeature Generators Candidates:{self.feature_generator_candidates}\
                 \nFeature Generators: {self.feature_generator}\
                 \nFeature Generators Minimal: {self.feature_generator_minimal}\
@@ -48,7 +67,8 @@ class TriadicConcept:
                 \nExtensional Generator Minimal: {self.extensional_generator_minimal}\
                 \nConcept Stability: {self.concept_stability}\
                 \nSeparation Index: {self.separation_index}\
-                \nConceptual Relevance: {self.conceptual_relevance}\n"
+                \nConceptual Relevance: {self.conceptual_relevance}\
+                \nConcept Similarity: \n{chr(10).join(format_concept_similarity(self))}\n"
 
     def __eq__(self, other):
         if other == self.extent:
@@ -939,59 +959,102 @@ class TriadicConcept:
                     intent, modus, round(separation_index, 3)])
 
         return triadic_concepts
-    
+
     def compute_conceptual_relevance(triadic_concepts, formal_context):
-                
+
         for concept in tqdm(triadic_concepts):
             all_intents = concept.intent
             all_modus = concept.modus
-            
+
             if concept.extent != EMPTY_SET:
                 for intent_modus in zip(all_intents, all_modus):
                     alpha = 0
                     count = 0
                     intent, modus = intent_modus[0], intent_modus[1]
                     attributes = set()
+
                     for _int in intent:
                         for _mod in modus:
                             if _int != 'ø' and _mod != 'ø':
                                 attributes.add(str(_int + ' ' + _mod))
-                    extent_derivation = set(formal_context.extension(attributes))
-                    
+                    extent_derivation = set(
+                        formal_context.extension(attributes))
+
                     for pair in attributes:
                         pair = set([pair])
                         attributes_check = attributes - set(pair)
-                        extent_derivation = set(formal_context.extension(attributes_check))
-                        
+                        extent_derivation = set(
+                            formal_context.extension(attributes_check))
                         if extent_derivation != concept.extent:
                             count += 1
-                    
                     try:
                         alpha = count/len(attributes)
                     except ZeroDivisionError:
-                            alpha = 0
-                    
+                        alpha = 0
                     flag = False
                     if 'ø' in intent or 'ø' in modus:
                         flag = True
-                    
                     beta = 0
                     generators = concept.feature_generator_minimal
                     if len(all_intents) > 1 and len(generators) > 1:
                         beta = (len(generators) / (2**len(all_intents) - 2))
-                    
                     try:
                         conceptual_relevance = (alpha + beta) / 2
                     except ZeroDivisionError:
-                            conceptual_relevance = 0
-                    
+                        conceptual_relevance = 0
                     if not flag:
                         triadic_concepts[triadic_concepts.index(concept.extent)].conceptual_relevance.append([
-                        intent, modus, round(conceptual_relevance, 3)])
-        
+                            intent, modus, round(conceptual_relevance, 3)])
+
         return triadic_concepts
-    
-    
+
+    def concept_similarity(triadic_concepts):
+        df = pd.DataFrame()
+
+        def return_attributes(intents, conditions):
+            attributes = []
+            for pair in zip(intents, conditions):
+                intent, modus = pair
+                for _int in intent:
+                    if _int != 'ø':
+                        for _mod in modus:
+                            if _mod != 'ø':
+                                add = str(_int) + " " + str(_mod)
+                                if add not in attributes:
+                                    attributes.append(add)
+            return attributes
+
+        for concept in tqdm(triadic_concepts):
+            similarities = []
+            sims = []
+            extent = concept.extent
+            intent = concept.intent
+            modus = concept.modus
+            attributes = return_attributes(intent, modus)
+
+            for concept_target in triadic_concepts:
+                extent_target = concept_target.extent
+                intent_target = concept_target.intent
+                modus_target = concept_target.modus
+                attributes_target = return_attributes(
+                    intent_target, modus_target)
+
+                similarity = round(len(list(set(attributes).intersection(set(
+                    attributes_target)))) / len(list(set(attributes).union(set(attributes_target)))), 3)
+                similarities.append([extent, extent_target, similarity])
+                sims.append(similarity)
+            triadic_concepts[triadic_concepts.index(
+                concept.extent)].concept_similarities.append(similarities)
+
+            col = str(','.join([','.join(x for x in sorted(extent))]))
+            if col == '':
+                col = 'ø'
+            df[str(col)] = sims
+        df.set_index(df.columns, inplace=True)
+        df.to_csv('similarity.csv', index=True)
+
+        return triadic_concepts
+
     def compute_extensional_generators(triadic_concepts, links):
         """Takes the triadic_concepts and links to compute
         Extensional Generators. These generators will be further
