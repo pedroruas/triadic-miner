@@ -1009,6 +1009,7 @@ class TriadicConcept:
         return triadic_concepts
 
     def concept_similarity(triadic_concepts):
+        data = {}
         df = pd.DataFrame()
 
         def return_attributes(intents, conditions):
@@ -1049,7 +1050,8 @@ class TriadicConcept:
             col = str(','.join([','.join(x for x in sorted(extent))]))
             if col == '':
                 col = 'ø'
-            df[str(col)] = sims
+            data[str(col)] = sims
+        df = pd.DataFrame(data=data, columns=data.keys())    
         df.set_index(df.columns, inplace=True)
         df.to_csv('similarity.csv', index=True)
 
