@@ -32,6 +32,7 @@ def triadic_miner(file_path,
                   BACAR_rules_file_path,
                   concept_stability_file_path,
                   separation_index_file_path,
+                  conceptual_relevance_index_file_path,
                   hasse_diagram_file_path):
 
     report = Report(report_file_path, file_name)
@@ -57,89 +58,108 @@ def triadic_miner(file_path,
     report.add_module_time('Running T-iPred', time)
 
     Timer.start("Computing F-Generators")
-    updated_triadic_concepts = TriadicConcept.compute_f_generators_candidates(
+    triadic_concepts = TriadicConcept.compute_f_generators_candidates(
         triadic_concepts, links, compute_feature_generators_for_infimum)
     time = Timer.stop()
     report.add_module_time('Computing F-Generators', time)
 
     Timer.start("Computing Formal Context")
     formal_context = TriadicConcept.compute_formal_context(
-        updated_triadic_concepts)
+        triadic_concepts)
     time = Timer.stop()
     report.add_module_time('Computing Formal Context', time)
 
     Timer.start("Validating Feature Generators")
-    updated_triadic_concepts = TriadicConcept.compute_feature_generator_validation(
-        updated_triadic_concepts, formal_context)
+    triadic_concepts = TriadicConcept.compute_feature_generator_validation(
+        triadic_concepts, formal_context)
     time = Timer.stop()
     report.add_module_time('Validating Feature Generators', time)
 
     Timer.start("Computing BCAI Implications")
     BCAI_implications = AssociationRule.compute_BCAI_implications(
-        updated_triadic_concepts, minimum_support_rules)
+        triadic_concepts, minimum_support_rules)
     time = Timer.stop()
     report.add_module_time('Computing BCAI Implications', time)
 
     Timer.start("Computing BACI Implications")
     BACI_implications = AssociationRule.compute_BACI_implications(
-        updated_triadic_concepts, minimum_support_rules)
+        triadic_concepts, minimum_support_rules)
     time = Timer.stop()
     report.add_module_time('Computing BACI Implications', time)
 
     Timer.start("Computing BCAAR Association Rules")
     BCAAR_rules = AssociationRule.compute_BCAAR_association_rules(
-        updated_triadic_concepts, minimum_support_rules,
+        triadic_concepts, minimum_support_rules,
         minimum_confidence_rules, links)
     time = Timer.stop()
     report.add_module_time('Computing BCAAR Association Rules', time)
 
     Timer.start("Computing BACAR Association Rules")
     BACAR_rules = AssociationRule.compute_BACAR_association_rules(
-        updated_triadic_concepts, minimum_support_rules,
+        triadic_concepts, minimum_support_rules,
         minimum_confidence_rules, links)
     time = Timer.stop()
     report.add_module_time('Computing BACAR Association Rules', time)
 
     if compute_extensional_implications:
         Timer.start("Computing Extensional Generators")
-        updated_triadic_concepts = TriadicConcept.compute_extensional_generators(
-            updated_triadic_concepts, links)
+        triadic_concepts = TriadicConcept.compute_extensional_generators(
+            triadic_concepts, links)
         time = Timer.stop()
         report.add_module_time('Computing Extensional Generators', time)
 
         Timer.start("Computing Extensional Implications")
         extensional_implications = AssociationRule.compute_extensional_implications(
-            updated_triadic_concepts, minimum_confidence_rules)
+            triadic_concepts, minimum_confidence_rules)
         time = Timer.stop()
         report.add_module_time('Computing Extensional Implications', time)
 
     if compute_concept_stability:
         Timer.start("Computing Concept Stability")
-        updated_triadic_concepts = TriadicConcept.compute_concept_stability(
+        triadic_concepts = TriadicConcept.compute_concept_stability(
             triadic_concepts, formal_context)
         time = Timer.stop()
         report.add_module_time('Computing Concept Stability', time)
 
     if compute_separation_index:
         Timer.start("Computing Separation Index")
-        updated_triadic_concepts = TriadicConcept.separation_index_calculation(
-            updated_triadic_concepts)
+        triadic_concepts = TriadicConcept.separation_index_calculation(
+            triadic_concepts)
         time = Timer.stop()
         report.add_module_time('Computing Separation Index', time)
 
     if save_hasse_diagram:
         Timer.start("Creating the Hasse Diagram")
         TriadicConcept.create_hasse_diagram(
-            updated_triadic_concepts, links, hasse_diagram_file_path)
+            triadic_concepts, links, hasse_diagram_file_path)
         time = Timer.stop()
         report.add_module_time('Creating the Hasse Diagram', time)
 
+    Timer.start("Computing Conceptual Relevance")
+    triadic_concepts = TriadicConcept.compute_conceptual_relevance(
+        triadic_concepts, formal_context)
+    time = Timer.stop()
+    report.add_module_time('Computing Conceptual Relevance', time)
+
+    Timer.start("Computing Concept Similarity")
+    triadic_concepts = TriadicConcept.concept_similarity(triadic_concepts)
+    time = Timer.stop()
+    report.add_module_time('Computing Concept Similarity', time)
+    
+    
+    # for rule in BCAAR_rules:
+    #     print(rule)
+    # for rule in BACAR_rules:
+    #     print(rule)
+    # for concept in triadic_concepts:
+    #     print(concept)
+
     report.save_report()
     report.save_triadic_concepts(
-        updated_triadic_concepts, triadic_concepts_file_path)
+        triadic_concepts, triadic_concepts_file_path)
     report.save_links(links, links_concepts_file_path)
     report.save_feature_generators(
-        updated_triadic_concepts, feature_generators_file_path)
+        triadic_concepts, feature_generators_file_path)
     report.save_BCAI_implications(
         BCAI_implications, BCAI_implications_file_path)
     report.save_BACI_implications(
@@ -148,16 +168,16 @@ def triadic_miner(file_path,
     report.save_BACAR_rules(BACAR_rules, BACAR_rules_file_path)
     if compute_concept_stability:
         report.save_concept_stability(
-            updated_triadic_concepts, concept_stability_file_path)
+            triadic_concepts, concept_stability_file_path)
     if compute_separation_index:
         report.save_separation_index(
-            updated_triadic_concepts, separation_index_file_path)
+            triadic_concepts, separation_index_file_path)
     if compute_extensional_implications:
         report.save_extensional_generators(
-            updated_triadic_concepts, extensional_generators_file_path)
+            triadic_concepts, extensional_generators_file_path)
         report.save_extensional_implications(
             extensional_implications, extensional_implications_file_path)
-
+    report.save_conceptual_relevance_index(triadic_concepts, conceptual_relevance_index_file_path)
 
 def main():
 
@@ -198,6 +218,8 @@ def main():
             output_dir, file_name)
         separation_index_file_path = '{0}{1}.separation_index'.format(
             output_dir, file_name)
+        conceptual_relevance_index_file_path = '{0}{1}.conceptual_relevance'.format(
+            output_dir, file_name)
         hasse_diagram_file_path = '{0}{1}.graphml'.format(
             output_dir, file_name+'_hasse_diagram')
         extensional_generators_file_path = '{0}{1}.ext_generators'.format(
@@ -225,6 +247,7 @@ def main():
                       BACAR_rules_file_path,
                       concept_stability_file_path,
                       separation_index_file_path,
+                      conceptual_relevance_index_file_path,
                       hasse_diagram_file_path)
 
 
