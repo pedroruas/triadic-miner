@@ -230,10 +230,10 @@ class Report():
     def save_separation_index(self,
                               triadic_concepts,
                               separation_index_file_path):
-
+        
         file = open(separation_index_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'SEPARATION INDEX', 7)
-
+        
         for concept in triadic_concepts:
             extent = concept.extent
             if extent == EMPTY_SET:
@@ -251,6 +251,35 @@ class Report():
                     separation = round(attribute[2], 3)
                     file.write(
                         '({0} - {1}) = {2}\n'.format(intent, modus, separation))
+            else:
+                file.write('[]\n')
+            file.write('\n')
+        file.close()
+        
+    def save_conceptual_relevance_index(self,
+                              triadic_concepts,
+                              conceptual_relevance_index_file_path):
+        
+        file = open(conceptual_relevance_index_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'CONCEPTUAL RELEVANCE', 7)
+        
+        for concept in triadic_concepts:
+            extent = concept.extent
+            if extent == EMPTY_SET:
+                extent = 'ø'
+            extent = str(
+                ', '.join([', '.join(x for x in sorted(extent))]))
+            file.write('EXTENT: {0}\n'.format(extent))
+            conceptual_relevance_idx = concept.conceptual_relevance
+            if not conceptual_relevance_idx == []:
+                for attribute in conceptual_relevance_idx:
+                    intent = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[0]))]))
+                    modus = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[1]))]))
+                    relevance = round(attribute[2], 3)
+                    file.write(
+                        '({0} - {1}) = {2}\n'.format(intent, modus, relevance))
             else:
                 file.write('[]\n')
             file.write('\n')
