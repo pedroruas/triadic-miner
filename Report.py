@@ -230,10 +230,10 @@ class Report():
     def save_separation_index(self,
                               triadic_concepts,
                               separation_index_file_path):
-        
+
         file = open(separation_index_file_path, 'w', encoding='utf-8')
         Report.write_header(file, 'SEPARATION INDEX', 7)
-        
+
         for concept in triadic_concepts:
             extent = concept.extent
             if extent == EMPTY_SET:
@@ -255,14 +255,14 @@ class Report():
                 file.write('[]\n')
             file.write('\n')
         file.close()
-        
-    def save_conceptual_relevance_index(self,
-                              triadic_concepts,
-                              conceptual_relevance_index_file_path):
-        
-        file = open(conceptual_relevance_index_file_path, 'w', encoding='utf-8')
-        Report.write_header(file, 'CONCEPTUAL RELEVANCE', 7)
-        
+
+    def save_triadic_relevance_index_index(self,
+                                           triadic_concepts,
+                                           triadic_relevance_index_file_path):
+
+        file = open(triadic_relevance_index_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'TRIADIC RELEVANCE INDEX', 6)
+
         for concept in triadic_concepts:
             extent = concept.extent
             if extent == EMPTY_SET:
@@ -270,9 +270,9 @@ class Report():
             extent = str(
                 ', '.join([', '.join(x for x in sorted(extent))]))
             file.write('EXTENT: {0}\n'.format(extent))
-            conceptual_relevance_idx = concept.conceptual_relevance
-            if not conceptual_relevance_idx == []:
-                for attribute in conceptual_relevance_idx:
+            triadic_relevance_index_idx = concept.triadic_relevance_index
+            if not triadic_relevance_index_idx == []:
+                for attribute in triadic_relevance_index_idx:
                     intent = str(
                         ', '.join([', '.join(x for x in sorted(attribute[0]))]))
                     modus = str(
