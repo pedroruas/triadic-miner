@@ -169,13 +169,6 @@ def triadic_miner(file_path,
         report.save_extensional_implications(
             extensional_implications, extensional_implications_file_path)
 
-    if not os.path.isfile("output/pickle_triadic_concepts_"+file_name):
-        pickle.dump(triadic_concepts, open(
-            "output/pickle_triadic_concepts_"+file_name, 'wb'))
-
-    if not os.path.isfile('output/pickle_links_'+file_name):
-        pickle.dump(links, open('output/pickle_links_'+file_name, 'wb'))
-
 
 def main():
 
