@@ -33,7 +33,7 @@ class TriadicConcept:
     extensional_generator_minimal: list[list] = field(default_factory=list)
     concept_stability: list[list] = field(default_factory=list)
     separation_index: list[list] = field(default_factory=list)
-    conceptual_relevance: list[list] = field(default_factory=list)
+    triadic_relevance_index: list[list] = field(default_factory=list)
 
     def __post_init__(self):
         self.sort_index = self.extent_size
@@ -51,7 +51,7 @@ class TriadicConcept:
                 \nExtensional Generator Minimal: {self.extensional_generator_minimal}\
                 \nConcept Stability: {self.concept_stability}\
                 \nSeparation Index: {self.separation_index}\
-                \nConceptual Relevance: {self.conceptual_relevance}"
+                \nConceptual Relevance: {self.triadic_relevance_index}"
 
     def __eq__(self, other):
         if other == self.extent:
@@ -978,7 +978,7 @@ class TriadicConcept:
 
         for concept in tqdm(triadic_concepts):
             triadic_concepts[triadic_concepts.index(
-                concept.extent)].conceptual_relevance = []
+                concept.extent)].triadic_relevance_index = []
             all_intents = concept.intent
             all_modus = concept.modus
 
@@ -1053,14 +1053,14 @@ class TriadicConcept:
                         if len(numerator) == 1 and (len(numerator) < len(attributes)):
                             beta = 1/len(attributes)
                     try:
-                        conceptual_relevance = (alpha + beta) / 2
+                        triadic_relevance_index = (alpha + beta) / 2
                     except ZeroDivisionError:
-                        conceptual_relevance = 0
+                        triadic_relevance_index = 0
                     if not flag:
-                        triadic_concepts[triadic_concepts.index(concept.extent)].conceptual_relevance.append([
-                            intent, modus, round(conceptual_relevance, 3),
+                        triadic_concepts[triadic_concepts.index(concept.extent)].triadic_relevance_index.append([
+                            intent, modus, round(triadic_relevance_index, 3),
                             {'triadic_concept': (concept.extent, intent, modus),
-                             'TRI score': round(conceptual_relevance, 3),
+                             'TRI score': round(triadic_relevance_index, 3),
                              'alpha': alpha,
                              'beta': beta,
                              'compatible_generators': compatible_generators,
