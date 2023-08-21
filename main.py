@@ -9,6 +9,7 @@ from Timer import Timer
 from TriadicConcept import TriadicConcept
 from AssociationRules import AssociationRule
 from Report import Report
+import pickle
 
 
 def triadic_miner(file_path,
@@ -32,7 +33,7 @@ def triadic_miner(file_path,
                   BACAR_rules_file_path,
                   concept_stability_file_path,
                   separation_index_file_path,
-                  conceptual_relevance_index_file_path,
+                  triadic_relevance_index_file_path,
                   hasse_diagram_file_path):
 
     report = Report(report_file_path, file_name)
@@ -135,24 +136,14 @@ def triadic_miner(file_path,
         time = Timer.stop()
         report.add_module_time('Creating the Hasse Diagram', time)
 
-    Timer.start("Computing Conceptual Relevance")
-    triadic_concepts = TriadicConcept.compute_conceptual_relevance(
+    Timer.start("Computing Triadic Relevance Index")
+    triadic_concepts = TriadicConcept.compute_triadic_relevance_index(
         triadic_concepts, formal_context)
     time = Timer.stop()
-    report.add_module_time('Computing Conceptual Relevance', time)
-
-    Timer.start("Computing Concept Similarity")
-    triadic_concepts = TriadicConcept.concept_similarity(triadic_concepts)
-    time = Timer.stop()
-    report.add_module_time('Computing Concept Similarity', time)
-    
-    
-    # for rule in BCAAR_rules:
-    #     print(rule)
-    # for rule in BACAR_rules:
-    #     print(rule)
-    # for concept in triadic_concepts:
-    #     print(concept)
+    report.add_module_time(
+        'Computing Triadic Relevance Index"', time)
+    report.save_triadic_relevance_index_index(
+        triadic_concepts, triadic_relevance_index_file_path)
 
     report.save_report()
     report.save_triadic_concepts(
@@ -177,7 +168,14 @@ def triadic_miner(file_path,
             triadic_concepts, extensional_generators_file_path)
         report.save_extensional_implications(
             extensional_implications, extensional_implications_file_path)
-    report.save_conceptual_relevance_index(triadic_concepts, conceptual_relevance_index_file_path)
+
+    if not os.path.isfile("output/pickle_triadic_concepts_"+file_name):
+        pickle.dump(triadic_concepts, open(
+            "output/pickle_triadic_concepts_"+file_name, 'wb'))
+
+    if not os.path.isfile('output/pickle_links_'+file_name):
+        pickle.dump(links, open('output/pickle_links_'+file_name, 'wb'))
+
 
 def main():
 
@@ -218,7 +216,7 @@ def main():
             output_dir, file_name)
         separation_index_file_path = '{0}{1}.separation_index'.format(
             output_dir, file_name)
-        conceptual_relevance_index_file_path = '{0}{1}.conceptual_relevance'.format(
+        triadic_relevance_index_file_path = '{0}{1}.triadic_relevance_index'.format(
             output_dir, file_name)
         hasse_diagram_file_path = '{0}{1}.graphml'.format(
             output_dir, file_name+'_hasse_diagram')
@@ -247,7 +245,7 @@ def main():
                       BACAR_rules_file_path,
                       concept_stability_file_path,
                       separation_index_file_path,
-                      conceptual_relevance_index_file_path,
+                      triadic_relevance_index_file_path,
                       hasse_diagram_file_path)
 
 
