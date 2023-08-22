@@ -51,7 +51,7 @@ class TriadicConcept:
                 \nExtensional Generator Minimal: {self.extensional_generator_minimal}\
                 \nConcept Stability: {self.concept_stability}\
                 \nSeparation Index: {self.separation_index}\
-                \nConceptual Relevance: {self.triadic_relevance_index}"
+                \nTriadic Relevance Index: {self.triadic_relevance_index}"
 
     def __eq__(self, other):
         if other == self.extent:
