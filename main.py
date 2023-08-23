@@ -9,7 +9,6 @@ from Timer import Timer
 from TriadicConcept import TriadicConcept
 from AssociationRules import AssociationRule
 from Report import Report
-import pickle
 
 
 def triadic_miner(file_path,
