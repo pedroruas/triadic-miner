@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+@author: pedroruas
+"""
+
 import pytest
 from AssociationRules import AssociationRule
 from TriadicConcept import TriadicConcept

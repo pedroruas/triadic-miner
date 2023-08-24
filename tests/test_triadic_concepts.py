@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+@author: pedroruas
+"""
+
 import pytest
 from TriadicConcept import TriadicConcept
 
@@ -29,7 +34,7 @@ def fixture_feature_generators() -> TriadicConcept:
         triadic_concepts, links, compute_feature_generators_for_infimum)
     formal_context = TriadicConcept.compute_formal_context(
         triadic_concepts)
-    
+
     return TriadicConcept.compute_feature_generator_validation(
         triadic_concepts, formal_context)
 
@@ -99,5 +104,3 @@ def test_separation_index(fixture_separation_index: TriadicConcept) -> None:
         {'1', '5'})].separation_index) == 2
     assert 0.176 == fixture_separation_index[fixture_separation_index.index(
         {'1', '4', '2'})].separation_index[0][-1]
-
-
