@@ -4,11 +4,11 @@
 
 
 <h1 align="center">
-  Triadic Miner
+  Triadic Pattern Miner
   <br>
 </h1>
 
-<p align="center">A <b>Python</b> library to mine <b>Triadic Concepts</b>.</p>
+<p align="center">A <b>Python</b> library to mine patterns in <b>Triadic Concepts</b>.</p>
 
 
 In this project, we use Triadic Concept Analysis as a framework to discover patterns expressed by <b>Triadic Concepts</b>, the <b>Hasse diagram</b> (for navigation/exploration), and by <b>Association Rules</b> (including implications).
@@ -27,7 +27,6 @@ In this project, we use Triadic Concept Analysis as a framework to discover patt
 * Compute 2 Triadic Concept relevancy scores:
     - Concept Stability
     - Separation Index
-    - Triadic Relevance Index
 * Construct a Hasse Diagram to visualize and explore Triadic Concepts and their upper and lower covers
 
 # How to Use
