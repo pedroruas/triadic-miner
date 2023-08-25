@@ -46,11 +46,11 @@ $ pip install -r requirements.txt
 # Run the app
 $ python main.py
 ```
-In the <i>'configs.json'</i> file, you will specify the input file(s), the output directory (where all generated files will be saved), and some execution parameters.
+In the <i>'configs.json'</i> file, you can specify the input file(s), the output directory (where all generated files will be saved), and some execution parameters.
 
 ## Data input
 
-The input file of our framework is a file with all the Triadic Concepts.
+The input of our framework is a file with all the Triadic Concepts.
 This file should contain:
 
 - One concept per line
