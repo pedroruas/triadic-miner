@@ -46,7 +46,7 @@ $ pip install -r requirements.txt
 # Run the app
 $ python main.py
 ```
-In the <i>'configs.json'</i> file, you can specify the input file(s), the output directory (where all generated files will be saved), and some execution parameters.
+In the <i>'configs.json'</i> file, you can specify the input file(s), the output directory (where all generated files will be saved), and also some execution parameters.
 
 ## Data input
 
