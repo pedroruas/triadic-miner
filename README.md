@@ -4,14 +4,14 @@
 
 
 <h1 align="center">
-  Triadic Miner
+  Triadic Pattern Miner
   <br>
 </h1>
 
-<p align="center">A <b>Python</b> library to mine <b>Triadic Concepts</b>.</p>
+<p align="center">A <b>Python</b> library to mine patterns in <b>Triadic Concepts</b>.</p>
 
 
-In this project, we use Triadic Concept Analysis as a framework to discover patterns expressed by <b>Triadic Concepts</b>, the <b>Hasse diagram</b> navigation/exploration, and by <b>Association Rules</b> (including implications).
+In this project, we use Triadic Concept Analysis as a framework to discover patterns expressed by <b>Triadic Concepts</b>, the <b>Hasse diagram</b> (for navigation/exploration), and by <b>Association Rules</b> (including implications).
 
 
 # Key Features
@@ -46,6 +46,40 @@ $ pip install -r requirements.txt
 # Run the app
 $ python main.py
 ```
+In the <i>'configs.json'</i> file, you can specify the input file(s), the output directory (where all generated files will be saved), and also some execution parameters.
+
+## Data input
+
+The input of our framework is a file with all the Triadic Concepts.
+This file should contain:
+
+- One concept per line
+- The elements of each dimension (objects, attributes, and conditions) are separated by commas
+- The dimensions are separated by spaces
+- The empty set is represented by 'ø'
+
+An example of an input file is:
+
+```bash
+obj1 att1 cond1
+obj2 att3 cond2,cond3
+obj3 att4,att5, cond1
+obj1,obj2,obj3 att2,att3 cond2,cond3
+```
+
+We recommend using the [Data Peeler](https://homepages.dcc.ufmg.br/~lcerf/fr/prototypes.html#d-peeler) algorithm to compute the Triadic Concepts (its output satisfies all the requirements mentioned above).
+
+
+## Hasse diagram visualization
+
+For the Hasse Diagram representation, we are using the [GraphML](http://graphml.graphdrawing.org/) ([GraphML Primer](http://graphml.graphdrawing.org/primer/graphml-primer.html)) file format. This is an open standard based on XML, and is supported by Python libraries such as [NetworkX](https://networkx.org/). 
+We recommend the [yEd Graph Editor](https://www.yworks.com/products/yed) software to visualize and explore the Hasse Diagram.
+
+After creating the <i>.graphml</i> file, open yEd Graph Editor and follow these steps:
+
+- Use Ctrl + A (Cmd + A on Mac) to select all nodes
+- Go to Tools > Fit Node to Label > click OK
+- Go to Layout > Hierarchical > click OK
 
 # Contributing
 

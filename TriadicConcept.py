@@ -33,20 +33,25 @@ class TriadicConcept:
     extensional_generator_minimal: list[list] = field(default_factory=list)
     concept_stability: list[list] = field(default_factory=list)
     separation_index: list[list] = field(default_factory=list)
+    triadic_relevance_index: list[list] = field(default_factory=list)
 
     def __post_init__(self):
         self.sort_index = self.extent_size
 
     def __str__(self):
-        return f"Extent: {self.extent}\nIntent: {self.intent}\
-                \nModus: {self.modus}\nExtent size: {self.extent_size}\
+
+        return f"Extent: {self.extent}\
+                \nIntent: {self.intent}\
+                \nModus: {self.modus}\
+                \nExtent size: {self.extent_size}\
                 \nFeature Generators Candidates:{self.feature_generator_candidates}\
                 \nFeature Generators: {self.feature_generator}\
                 \nFeature Generators Minimal: {self.feature_generator_minimal}\
                 \nExtensional Generator Candidates: {self.extensional_generator_candidates}\
                 \nExtensional Generator Minimal: {self.extensional_generator_minimal}\
                 \nConcept Stability: {self.concept_stability}\
-                \nSeparation Index: {self.separation_index}\n"
+                \nSeparation Index: {self.separation_index}\
+                \nTriadic Relevance Index: {self.triadic_relevance_index}"
 
     def __eq__(self, other):
         if other == self.extent:

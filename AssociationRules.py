@@ -24,7 +24,7 @@ class AssociationRule:
     support: float = field(default_factory=float)
     confidence: float = field(default_factory=float)
     current_concept_extent: set = field(default_factory=set)
-    predecessor_concept_extent: set = field(default_factory=set)
+    successor_concept_extent: set = field(default_factory=set)
 
     def __str__(self):
         antecedent = str(
@@ -35,15 +35,15 @@ class AssociationRule:
             ', '.join([', '.join(x for x in sorted(self.condition))]))
         current_concept_extent = str(
             ', '.join([', '.join(x for x in sorted(self.current_concept_extent))]))
-        predecessor_concept_extent = self.predecessor_concept_extent
-        if predecessor_concept_extent is not None:
-            predecessor_concept_extent = str(
-                ', '.join([', '.join(x for x in sorted(self.predecessor_concept_extent))]))
+        successor_concept_extent = self.successor_concept_extent
+        if successor_concept_extent is not None:
+            successor_concept_extent = str(
+                ', '.join([', '.join(x for x in sorted(self.successor_concept_extent))]))
 
         return f"({antecedent} -> {consequent}) {condition}\
                 \t(sup: {self.support}, conf: {self.confidence})\
                 \nConcept extent: {current_concept_extent}\
-                \nPredecessor concept: {predecessor_concept_extent}\n"
+                \nSuccessor concept: {successor_concept_extent}\n"
 
     def compute_BCAI_implications(triadic_concepts, minimum_support_rules):
         """Takes the triadic_concepts and the minimum_support_rules value to
@@ -99,7 +99,7 @@ class AssociationRule:
                                                            support, 3),
                                                        confidence=1.0,
                                                        current_concept_extent=extent,
-                                                       predecessor_concept_extent=None)
+                                                       successor_concept_extent=None)
                                 if rule not in BCAI_implications:
                                     BCAI_implications.append(rule)
 
@@ -158,7 +158,7 @@ class AssociationRule:
                                                            support, 3),
                                                        confidence=1.0,
                                                        current_concept_extent=extent,
-                                                       predecessor_concept_extent=None)
+                                                       successor_concept_extent=None)
                                 if rule not in BACI_implications:
                                     BACI_implications.append(rule)
 
@@ -284,7 +284,7 @@ class AssociationRule:
                                         support=round(support, 3),
                                         confidence=round(confidence, 3),
                                         current_concept_extent=source_concept,
-                                        predecessor_concept_extent=target_concept)
+                                        successor_concept_extent=target_concept)
                                     if rule not in rules_BCAAR:
                                         rules_BCAAR.append(rule)
 
@@ -413,7 +413,7 @@ class AssociationRule:
                                         support=round(support, 3),
                                         confidence=round(confidence, 3),
                                         current_concept_extent=source_concept,
-                                        predecessor_concept_extent=target_concept)
+                                        successor_concept_extent=target_concept)
                                     if rule not in rules_BACAR:
                                         rules_BACAR.append(rule)
 

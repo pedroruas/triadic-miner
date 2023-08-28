@@ -256,6 +256,35 @@ class Report():
             file.write('\n')
         file.close()
 
+    def save_triadic_relevance_index_index(self,
+                                           triadic_concepts,
+                                           triadic_relevance_index_file_path):
+
+        file = open(triadic_relevance_index_file_path, 'w', encoding='utf-8')
+        Report.write_header(file, 'TRIADIC RELEVANCE INDEX', 6)
+
+        for concept in triadic_concepts:
+            extent = concept.extent
+            if extent == EMPTY_SET:
+                extent = 'ø'
+            extent = str(
+                ', '.join([', '.join(x for x in sorted(extent))]))
+            file.write('EXTENT: {0}\n'.format(extent))
+            triadic_relevance_index_idx = concept.triadic_relevance_index
+            if not triadic_relevance_index_idx == []:
+                for attribute in triadic_relevance_index_idx:
+                    intent = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[0]))]))
+                    modus = str(
+                        ', '.join([', '.join(x for x in sorted(attribute[1]))]))
+                    relevance = round(attribute[2], 3)
+                    file.write(
+                        '({0} - {1}) = {2}\n'.format(intent, modus, relevance))
+            else:
+                file.write('[]\n')
+            file.write('\n')
+        file.close()
+
     def save_extensional_generators(self,
                                     triadic_concepts,
                                     extensional_generators_file_path):
