@@ -77,8 +77,37 @@ def test_reading_triadic_concepts_file(fixture_triadic_concepts: TriadicConcept)
 def test_T_iPred(fixture_links: list) -> None:
     assert len(fixture_links) == 29
     assert ({'5'}, frozenset()) in fixture_links
-    assert ({'3', '1', '4', '2', '5'}, frozenset(
-        {'4', '5', '3', '1'})) in fixture_links
+    assert ({'2'}, frozenset()) in fixture_links
+    assert ({'1'}, frozenset()) in fixture_links
+    assert ({'4'}, frozenset()) in fixture_links
+    assert ({'3', '4'}, frozenset({'4'})) in fixture_links
+    assert ({'1', '4'}, frozenset({'4'})) in fixture_links
+    assert ({'1', '4'}, frozenset({'1'})) in fixture_links
+    assert ({'2', '4'}, frozenset({'4'})) in fixture_links
+    assert ({'2', '4'}, frozenset({'2'})) in fixture_links
+    assert ({'2', '5'}, frozenset({'2'})) in fixture_links
+    assert ({'2', '5'}, frozenset({'5'})) in fixture_links
+    assert ({'1', '5'}, frozenset({'1'})) in fixture_links
+    assert ({'1', '5'}, frozenset({'5'})) in fixture_links
+    assert ({'5', '3', '4'}, frozenset({'5'})) in fixture_links
+    assert ({'5', '3', '4'}, frozenset({'3', '4'})) in fixture_links
+    assert ({'1', '3', '4'}, frozenset({'1', '4'})) in fixture_links
+    assert ({'1', '3', '4'}, frozenset({'3', '4'})) in fixture_links
+    assert ({'1', '2', '4'}, frozenset({'4', '2'})) in fixture_links
+    assert ({'1', '2', '4'}, frozenset({'1', '4'})) in fixture_links
+    assert ({'1', '3', '5'}, frozenset({'1', '5'})) in fixture_links
+    assert ({'5', '1', '3', '4'}, frozenset({'1', '3', '5'})) in fixture_links
+    assert ({'5', '1', '3', '4'}, frozenset({'1', '3', '4'})) in fixture_links
+    assert ({'5', '1', '3', '4'}, frozenset({'4', '3', '5'})) in fixture_links
+    assert ({'5', '2', '3', '4'}, frozenset({'4', '2'})) in fixture_links
+    assert ({'5', '2', '3', '4'}, frozenset({'4', '3', '5'})) in fixture_links
+    assert ({'5', '2', '3', '4'}, frozenset({'5', '2'})) in fixture_links
+    assert ({'3', '2', '1', '4', '5'}, frozenset(
+        {'1', '4', '3', '5'})) in fixture_links
+    assert ({'3', '2', '1', '4', '5'}, frozenset(
+        {'4', '2', '3', '5'})) in fixture_links
+    assert ({'3', '2', '1', '4', '5'}, frozenset(
+        {'1', '4', '2'})) in fixture_links
 
 
 def test_feature_generators(fixture_feature_generators: TriadicConcept) -> None:
