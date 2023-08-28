@@ -32,7 +32,6 @@ def triadic_miner(file_path,
                   BACAR_rules_file_path,
                   concept_stability_file_path,
                   separation_index_file_path,
-                  triadic_relevance_index_file_path,
                   hasse_diagram_file_path):
 
     report = Report(report_file_path, file_name)
@@ -135,15 +134,6 @@ def triadic_miner(file_path,
         time = Timer.stop()
         report.add_module_time('Creating the Hasse Diagram', time)
 
-    Timer.start("Computing Triadic Relevance Index")
-    triadic_concepts = TriadicConcept.compute_triadic_relevance_index(
-        triadic_concepts, formal_context)
-    time = Timer.stop()
-    report.add_module_time(
-        'Computing Triadic Relevance Index"', time)
-    report.save_triadic_relevance_index_index(
-        triadic_concepts, triadic_relevance_index_file_path)
-
     report.save_report()
     report.save_triadic_concepts(
         triadic_concepts, triadic_concepts_file_path)
@@ -237,7 +227,6 @@ def main():
                       BACAR_rules_file_path,
                       concept_stability_file_path,
                       separation_index_file_path,
-                      triadic_relevance_index_file_path,
                       hasse_diagram_file_path)
 
 
