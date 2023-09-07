@@ -2,11 +2,12 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-<h1 align="center">
+<p align="center"><img align="center" width="380" src="./logos/logo_triadic_miner_white.png#gh-dark-mode-only"/></p>
+<p align="center"><img align="center" width="380" src="./logos/logo_triadic_miner_black.png#gh-light-mode-only"/></p>
+<!-- <h1 align="center">
   Triadic Pattern Miner
   <br>
-</h1>
+</h1> -->
 
 <p align="center">A <b>Python</b> library to mine patterns in <b>Triadic Concepts</b>.</p>
 
