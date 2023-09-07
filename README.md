@@ -2,8 +2,8 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-<p align="center"><img align="center" width="380" src="./logo/logo_triadic_miner_white.png#gh-dark-mode-only"/></p>
-<p align="center"><img align="center" width="380" src="./logo/logo_triadic_miner_black.png#gh-light-mode-only"/></p>
+<p align="center"><img align="center" width="380" src="./logos/logo_triadic_miner_white.png#gh-dark-mode-only"/></p>
+<p align="center"><img align="center" width="380" src="./logos/logo_triadic_miner_black.png#gh-light-mode-only"/></p>
 <!-- <h1 align="center">
   Triadic Pattern Miner
   <br>
