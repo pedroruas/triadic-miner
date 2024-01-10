@@ -13,7 +13,7 @@ def fixture_BCAI_implications() -> AssociationRule:
     minimum_support_rules = 0.1
     compute_feature_generators_for_infimum = False
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
     links = TriadicConcept.T_iPred(triadic_concepts, faces, all_extents)
@@ -33,7 +33,7 @@ def fixture_BACI_implications() -> AssociationRule:
     minimum_support_rules = 0.1
     compute_feature_generators_for_infimum = False
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
     links = TriadicConcept.T_iPred(triadic_concepts, faces, all_extents)
@@ -54,7 +54,7 @@ def fixture_BCAAR_association_rules() -> AssociationRule:
     minimum_confidence_rules = 0.1
     compute_feature_generators_for_infimum = False
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
     links = TriadicConcept.T_iPred(triadic_concepts, faces, all_extents)
@@ -75,7 +75,7 @@ def fixture_BACAR_association_rules() -> AssociationRule:
     minimum_confidence_rules = 0.1
     compute_feature_generators_for_infimum = False
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
     links = TriadicConcept.T_iPred(triadic_concepts, faces, all_extents)

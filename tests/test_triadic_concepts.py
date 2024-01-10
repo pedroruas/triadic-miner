@@ -9,13 +9,13 @@ from TriadicConcept import TriadicConcept
 
 @pytest.fixture
 def fixture_triadic_concepts() -> TriadicConcept:
-    return TriadicConcept.get_triadic_concepts_from_input_file('Data/example_PNKRS_2017_big.data.out')
+    return TriadicConcept.get_triadic_concepts_from_input_file('Data/example_PNKRS.data.out')
 
 
 @pytest.fixture
 def fixture_links() -> list:
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
     return TriadicConcept.T_iPred(triadic_concepts, faces, all_extents)
@@ -26,7 +26,7 @@ def fixture_feature_generators() -> TriadicConcept:
     compute_feature_generators_for_infimum = False
 
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     faces, all_extents = TriadicConcept.create_triadic_concepts_faces(
         triadic_concepts)
     links = TriadicConcept.T_iPred(triadic_concepts, faces, all_extents)
@@ -42,7 +42,7 @@ def fixture_feature_generators() -> TriadicConcept:
 @pytest.fixture
 def fixture_concept_stability() -> TriadicConcept:
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     formal_context = TriadicConcept.compute_formal_context(
         triadic_concepts)
     return TriadicConcept.compute_concept_stability(
@@ -52,7 +52,7 @@ def fixture_concept_stability() -> TriadicConcept:
 @pytest.fixture
 def fixture_separation_index() -> TriadicConcept:
     triadic_concepts = TriadicConcept.get_triadic_concepts_from_input_file(
-        'Data/example_PNKRS_2017_big.data.out')
+        'Data/example_PNKRS.data.out')
     return TriadicConcept.separation_index_calculation(triadic_concepts)
 
 
