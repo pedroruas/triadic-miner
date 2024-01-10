@@ -64,7 +64,7 @@ An example of an input file is:
 ```bash
 obj1 att1 cond1
 obj2 att3 cond2,cond3
-obj3 att4,att5, cond1
+obj3 att4,att5 cond1
 obj1,obj2,obj3 att2,att3 cond2,cond3
 ```
 
