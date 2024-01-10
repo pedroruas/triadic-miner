@@ -198,8 +198,6 @@ def main():
             output_dir, file_name)
         separation_index_file_path = '{0}{1}.separation_index'.format(
             output_dir, file_name)
-        triadic_relevance_index_file_path = '{0}{1}.triadic_relevance_index'.format(
-            output_dir, file_name)
         hasse_diagram_file_path = '{0}{1}.graphml'.format(
             output_dir, file_name+'_hasse_diagram')
         extensional_generators_file_path = '{0}{1}.ext_generators'.format(
