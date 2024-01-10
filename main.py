@@ -5,10 +5,10 @@
 
 import json
 import os
-from Timer import Timer
-from TriadicConcept import TriadicConcept
-from AssociationRules import AssociationRule
-from Report import Report
+from triadic_miner.Timer import Timer
+from triadic_miner.TriadicConcept import TriadicConcept
+from triadic_miner.AssociationRules import AssociationRule
+from triadic_miner.Report import Report
 
 
 def triadic_miner(file_path,

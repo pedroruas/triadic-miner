@@ -4,8 +4,8 @@
 """
 
 import pytest
-from AssociationRules import AssociationRule
-from TriadicConcept import TriadicConcept
+from triadic_miner.AssociationRules import AssociationRule
+from triadic_miner.TriadicConcept import TriadicConcept
 
 
 @pytest.fixture

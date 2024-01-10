@@ -4,7 +4,7 @@
 """
 
 import pytest
-from TriadicConcept import TriadicConcept
+from triadic_miner.TriadicConcept import TriadicConcept
 
 
 @pytest.fixture
