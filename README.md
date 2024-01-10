@@ -100,6 +100,10 @@ Pedro Ruas, Ph.D - pedrohbruas@gmail.com
 
 Rokia Missaoui, Ph.D - Rokia.Missaoui@uqo.ca
 
+# Acknowledgment
+
+We acknowledge the support of the Natural Sciences and Engineering Research Council of Canada (NSERC).
+
 
 # License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
