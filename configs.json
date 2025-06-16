@@ -1,13 +1,13 @@
 {
   "_comment": [ 
-    "Data/example_PNKRS.data.out"
+    "You can specify multiple files as input by providing them as a list"
   ],
   "input_files": [ 
-    "Data/example_PNKRS.data.out"
+    "input/example_PNKRS.data.out"
   ],
   "output_dir": "output/",
-  "minimum_support_rules": 0.01,
-  "minimum_confidence_rules": 0.01,
+  "minimum_support_rules": 0.1,
+  "minimum_confidence_rules": 0.1,
   "compute_feature_generators_for_infimum": false,
   "compute_extensional_implications": false,
   "compute_concept_stability" : false,
