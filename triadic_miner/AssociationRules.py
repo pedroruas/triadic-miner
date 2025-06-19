@@ -46,6 +46,32 @@ class AssociationRule:
                 \nConcept extent: {current_concept_extent}\
                 \nSuccessor concept: {successor_concept_extent}\n"
 
+    def is_redundant(new_rule, existing_rules):
+        """
+        Checks whether a new association rule is redundant given the existing rules.
+
+        A rule is considered redundant if there is already an existing rule with the same
+        antecedent and condition, and whose consequent contains all elements of the new rule's consequent.
+        This ensures that more general rules (with larger consequents) are kept, while more specific
+        or nested rules (with smaller consequents but same support and condition) are discarded.
+
+        Args:
+            new_rule (AssociationRule): The candidate rule to check for redundancy.
+            existing_rules (list): The list of already generated AssociationRule objects.
+
+        Returns:
+            bool: True if the new_rule is redundant and should not be added;
+                  False if it is a novel and non-redundant rule.
+        """
+        for existing_rule in existing_rules:
+            if (
+                existing_rule.antecedent == new_rule.antecedent
+                and existing_rule.condition == new_rule.condition
+                and set(new_rule.consequent).issubset(set(existing_rule.consequent))
+            ):
+                return True
+        return False
+
     def compute_BCAI_implications(triadic_concepts, minimum_support_rules):
         """Takes the triadic_concepts and the minimum_support_rules value to
         compute the BCAI Implications that meets the minimum support value
@@ -102,8 +128,11 @@ class AssociationRule:
                                     current_concept_extent=extent,
                                     successor_concept_extent=None,
                                 )
-                                if rule not in BCAI_implications:
-                                    BCAI_implications.append(rule)
+                                if not AssociationRule.is_redundant(
+                                    rule, BCAI_implications
+                                ):
+                                    if rule not in BCAI_implications:
+                                        BCAI_implications.append(rule)
 
         return BCAI_implications
 
@@ -163,8 +192,11 @@ class AssociationRule:
                                     current_concept_extent=extent,
                                     successor_concept_extent=None,
                                 )
-                                if rule not in BACI_implications:
-                                    BACI_implications.append(rule)
+                                if not AssociationRule.is_redundant(
+                                    rule, BACI_implications
+                                ):
+                                    if rule not in BACI_implications:
+                                        BACI_implications.append(rule)
 
         return BACI_implications
 

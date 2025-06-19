@@ -9,7 +9,6 @@ EMPTY_SET = set([])
 
 
 class Report:
-
     def __init__(self, file_path, file_name):
         self.file_path = file_path
         self.file_name = file_name
@@ -92,7 +91,6 @@ class Report:
         file.close()
 
     def save_feature_generators(self, triadic_concepts, feature_generators_file_path):
-
         def format_generator_part(part):
             if isinstance(part, (list, set)):
                 return ", ".join(sorted(part))
