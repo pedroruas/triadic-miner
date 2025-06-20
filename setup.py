@@ -5,9 +5,11 @@ setup(
     version="0.1",
     packages=find_packages(),
     install_requires=[
-        "pandas==1.5.3",
-        "tqdm==4.64.1",
         "concepts==0.9.2",
+        "networkx==3.5",
+        "pandas==1.5.3",
+        "pyvis==0.3.2",
         "pyyed==1.5.0",
+        "tqdm==4.64.1",
     ],
 )
