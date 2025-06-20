@@ -126,7 +126,7 @@ If you have suggestions for improvements, feel free to:
 2. Create a feature branch:  
    `git checkout -b dev/YourFeatureName`
 3. Commit your changes:  
-   `git commit -m 'Add some feature'`
+   `git commit -m 'Short description of your feature'`
 4. Push to your branch:  
    `git push origin dev/YourFeatureName`
 5. Open a Pull Request
@@ -150,7 +150,7 @@ This project was supported by the **Natural Sciences and Engineering Research Co
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See `LICENSE.md` for more information.
 
 [linkedin-url]: https://www.linkedin.com/in/pedro-ruas-666a7365/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
