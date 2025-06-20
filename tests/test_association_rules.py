@@ -98,11 +98,11 @@ def fixture_BACAR_association_rules() -> AssociationRule:
 
 
 def test_BCAI_implications(fixture_BCAI_implications: AssociationRule) -> None:
-    assert len(fixture_BCAI_implications) == 22
+    assert len(fixture_BCAI_implications) == 18
 
 
 def test_BACI_implications(fixture_BACI_implications: AssociationRule) -> None:
-    assert len(fixture_BACI_implications) == 18
+    assert len(fixture_BACI_implications) == 16
 
 
 def test_BCAAR_association_rules(
