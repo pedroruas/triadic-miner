@@ -12,6 +12,9 @@ from concepts import Definition, Context
 import pyyed
 from itertools import chain, combinations
 
+import networkx as nx
+from pyvis.network import Network
+
 
 EMPTY_SET = set([])
 PROCESSES = 8  # Amount of threads to be used in multithreading
@@ -1167,71 +1170,61 @@ class TriadicConcept:
 
         return triadic_concepts
 
-    def create_hasse_diagram(triadic_concepts, links, hasse_diagram_file_path):
-        """Takes the triadic_concepts, links and hasse_diagram_file_path to create the
-        Hasse Diagram with all the links between the Triadic Concepts and
-        annotated with the Feature Generators.
-        The Hasse Diagram is a .graphml file that can be displayed on
-        external softwares (as yEd) and it is saved in the output folder
-        that the user specified in the configs.json file.
+    def create_hasse_diagram(
+        triadic_concepts, links, hasse_diagram_file_path, hasse_diagram_html_file_path
+    ):
+        """
+        Creates the Hasse Diagram from a list of Triadic Concepts and links between them.
+        Generates both:
+        - A .graphml file (for visualization in tools like yEd)
+        - An interactive HTML file (for web visualization with hierarchical layout and tooltips)
 
         Args:
-            triadic_concepts (list): list of TriadicConcept objects
-            links (list): list with the links between Triadic Concepts
-            file_name (str): input file name
+            triadic_concepts (list): List of TriadicConcept objects.
+            links (list): List of tuple links between Triadic Concepts.
+            hasse_diagram_file_path (str): Output path for the .graphml file.
+            hasse_diagram_html_file_path (str): Output path for the HTML interactive visualization.
         """
 
+        # ---------- Part 1: Create GraphML using PyYed ----------
+        hasse = pyyed.Graph()
         nodes = []
 
         def format_generators(generators):
-            t_gens = []
-            if generators == []:
+            if not generators:
                 return "ø"
+            formatted = []
             for v in generators:
                 if isinstance(v[0], list):
-                    intent = [", ".join(x for x in sorted(v[0]))]
-                    modus = [", ".join(x for x in sorted(v[1]))]
-                    t_gen = (
-                        str("(" + ", ".join([x for x in intent]))
-                        + " - "
-                        + str(", ".join([x for x in modus]))
-                        + ")"
-                    )
-                    t_gens.append(t_gen)
+                    intent = ", ".join(sorted(v[0]))
+                    modus = ", ".join(sorted(v[1]))
+                    formatted.append(f"({intent} - {modus})")
                 else:
-                    t_gen = "(" + str(v[0]) + " - " + str(v[1]) + ")"
-                    t_gens.append(t_gen)
-            if len(t_gens) > 1:
-                return ["\n".join(x for x in t_gens)][0]
-            else:
-                return t_gens[0]
+                    formatted.append(f"({v[0]} - {v[1]})")
+            return "\n".join(formatted)
 
-        def check_concept(concept, concept_original, nodes):
-            if concept not in nodes:
-                attributes = []
+        def check_concept(concept, concept_original, nodes_list):
+            if concept not in nodes_list:
+                idx = triadic_concepts.index(concept_original)
+                concept_intent = triadic_concepts[idx].intent
+                concept_modus = triadic_concepts[idx].modus
+                concept_generators = triadic_concepts[idx].feature_generator_minimal
 
-                concept_intent = triadic_concepts[
-                    triadic_concepts.index(concept_original)
-                ].intent
-                concept_modus = triadic_concepts[
-                    triadic_concepts.index(concept_original)
-                ].modus
-                concept_generators = triadic_concepts[
-                    triadic_concepts.index(concept_original)
-                ].feature_generator_minimal
-
-                for attribute in zip(concept_intent, concept_modus):
-                    _int = str(", ".join(x for x in sorted(attribute[0])))
-                    _modus = str(", ".join(x for x in sorted(attribute[1])))
-                    attributes.append(str("({0} - {1})".format(_int, _modus)))
-
+                # Create main node
                 hasse.add_node(
                     concept,
                     shape_fill="#FFFFFF",
                     shape="roundrectangle",
                     font_size="14",
                 )
-                label = str("Features:\n" + "\n".join(x for x in attributes))
+
+                # Create Features label node
+                attributes = []
+                for attr_int, attr_mod in zip(concept_intent, concept_modus):
+                    _int = ", ".join(sorted(attr_int))
+                    _mod = ", ".join(sorted(attr_mod))
+                    attributes.append(f"({_int} - {_mod})")
+                label = "Features:\n" + "\n".join(attributes)
                 hasse.add_node(
                     concept + "concepts",
                     label=label,
@@ -1242,11 +1235,12 @@ class TriadicConcept:
                 hasse.add_edge(
                     concept + "concepts", concept, line_type="dotted", arrowhead="none"
                 )
-                nodes.append(concept)
+
+                # Create Generators label node
                 generators = format_generators(concept_generators)
                 hasse.add_node(
                     concept + "gen",
-                    label="F-generators:\n" + generators,
+                    label=f"F-generators:\n{generators}",
                     shape_fill="#cee2f7",
                     shape="rectangle",
                     font_size="14",
@@ -1255,20 +1249,120 @@ class TriadicConcept:
                     concept + "gen", concept, line_type="dotted", arrowhead="none"
                 )
 
-        hasse = pyyed.Graph()
-        for link in tqdm(links):
-            concept, successor = link[0], link[1]
-            concept_original = concept.copy()
-            successor_original = successor.copy()
-            if concept == EMPTY_SET:
-                concept = "ø"
-            if successor == EMPTY_SET:
-                successor = "ø"
-            concept = str(", ".join(x for x in sorted(concept)))
-            successor = str(", ".join(x for x in sorted(successor)))
+                nodes_list.append(concept)
 
-            check_concept(concept, concept_original, nodes)
-            check_concept(successor, successor_original, nodes)
-            hasse.add_edge(concept, successor, arrowhead="t_shape")
+        for link in tqdm(links, desc="Building GraphML"):
+            concept, successor = link[0], link[1]
+            concept_original, successor_original = concept.copy(), successor.copy()
+
+            concept_str = "ø" if concept == EMPTY_SET else ", ".join(sorted(concept))
+            successor_str = (
+                "ø" if successor == EMPTY_SET else ", ".join(sorted(successor))
+            )
+
+            check_concept(concept_str, concept_original, nodes)
+            check_concept(successor_str, successor_original, nodes)
+            hasse.add_edge(concept_str, successor_str, arrowhead="t_shape")
 
         hasse.write_graph(hasse_diagram_file_path, pretty_print=True)
+
+        # ---------- Part 2: Create Interactive HTML with Hierarchical Layout and Tooltips ----------
+        G = nx.DiGraph()
+        node_labels = {}
+
+        for link in links:
+            concept, successor = link[0], link[1]
+            concept_str = "ø" if concept == EMPTY_SET else ", ".join(sorted(concept))
+            successor_str = (
+                "ø" if successor == EMPTY_SET else ", ".join(sorted(successor))
+            )
+
+            for node_str, node_original in [
+                (concept_str, concept),
+                (successor_str, successor),
+            ]:
+                if node_str not in node_labels:
+                    if node_original != []:
+                        try:
+                            idx = triadic_concepts.index(node_original.copy())
+                            concept_intent = triadic_concepts[idx].intent
+                            concept_modus = triadic_concepts[idx].modus
+                            concept_generators = triadic_concepts[
+                                idx
+                            ].feature_generator_minimal
+
+                            # Build Features part
+                            attributes = []
+                            for attr_int, attr_mod in zip(
+                                concept_intent, concept_modus
+                            ):
+                                _int = ", ".join(sorted(attr_int))
+                                _mod = ", ".join(sorted(attr_mod))
+                                attributes.append(f"({_int} - {_mod})")
+                            features_text = "Features:\n" + "\n".join(attributes)
+
+                            # Build Generators part
+                            if not concept_generators:
+                                generators_text = "Generators:\nø"
+                            else:
+                                generators_list = []
+                                for gen in concept_generators:
+                                    if isinstance(gen[0], list):
+                                        intent = ", ".join(sorted(gen[0]))
+                                        modus = ", ".join(sorted(gen[1]))
+                                        generators_list.append(f"({intent} - {modus})")
+                                    else:
+                                        generators_list.append(f"({gen[0]} - {gen[1]})")
+                                generators_text = "Generators:\n" + "\n".join(
+                                    generators_list
+                                )
+
+                            tooltip = features_text + "\n\n" + generators_text
+
+                        except ValueError:
+                            tooltip = "Concept not found"
+                    else:
+                        tooltip = "Empty concept"
+
+                    G.add_node(node_str, label=node_str, title=tooltip)
+                    node_labels[node_str] = True
+
+            G.add_edge(concept_str, successor_str, arrows="none")
+
+        net = Network(height="800px", width="100%", directed=True)
+        net.from_nx(G)
+
+        net.set_options(
+            """
+            {
+            "layout": {
+                "hierarchical": {
+                "enabled": true,
+                "levelSeparation": 150,
+                "nodeSpacing": 100,
+                "treeSpacing": 200,
+                "direction": "UD",
+                "sortMethod": "directed"
+                }
+            },
+            "physics": {
+                "enabled": false
+            },
+            "edges": {
+                "arrows": {
+                "to": {
+                    "enabled": false
+                }
+                },
+                "smooth": {
+                "enabled": false
+                }
+            },
+            "configure": {
+                "enabled": true
+            }
+            }
+            """
+        )
+
+        net.save_graph(hasse_diagram_html_file_path)

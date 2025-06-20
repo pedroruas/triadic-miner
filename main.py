@@ -34,6 +34,7 @@ def triadic_miner(
     concept_stability_file_path,
     separation_index_file_path,
     hasse_diagram_file_path,
+    hasse_diagram_html_file_path,
 ):
 
     report = Report(report_file_path, file_name)
@@ -135,7 +136,10 @@ def triadic_miner(
     if save_hasse_diagram:
         Timer.start("Creating the Hasse Diagram")
         TriadicConcept.create_hasse_diagram(
-            triadic_concepts, links, hasse_diagram_file_path
+            triadic_concepts,
+            links,
+            hasse_diagram_file_path,
+            hasse_diagram_html_file_path,
         )
         time = Timer.stop()
         report.add_module_time("Creating the Hasse Diagram", time)
@@ -205,6 +209,10 @@ def main():
         hasse_diagram_file_path = os.path.join(
             output_dir, f"{file_name}_hasse_diagram.graphml"
         )
+        hasse_diagram_html_file_path = os.path.join(
+            output_dir, f"{file_name}_hasse_diagram.html"
+        )
+
         extensional_generators_file_path = os.path.join(
             output_dir, f"{file_name}.ext_generators"
         )
@@ -235,6 +243,7 @@ def main():
             concept_stability_file_path,
             separation_index_file_path,
             hasse_diagram_file_path,
+            hasse_diagram_html_file_path,
         )
 
 
