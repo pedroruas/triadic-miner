@@ -7,6 +7,7 @@ setup(
     install_requires=[
         "concepts==0.9.2",
         "networkx==3.5",
+        "numpy==1.26.4",
         "pandas==1.5.3",
         "pyvis==0.3.2",
         "pyyed==1.5.0",
