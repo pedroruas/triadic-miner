@@ -2,6 +2,13 @@ import operator
 from collections import defaultdict
 from typing import List, Dict, Tuple, Any
 
+"""
+This solution was proposed in the paper "Group Querying in Tridimensional Social Networks" paper,
+presented in ASONAM 2026.
+Paper: https://www.researchgate.net/publication/395443772_Group_Querying_in_Tridimensional_Social_Networks
+    
+"""
+
 def load_concepts_from_file(file_path: str) -> Tuple[List[Dict[str, Any]], Dict[int, Dict[str, Any]]]:
     """
     Reads the data file and structures the triadic concepts.
